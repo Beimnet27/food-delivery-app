@@ -6,6 +6,7 @@ import Signup from './pages/Signup';
 import Home from './pages/Home';
 import DeliveryHome from './pages/DeliveryHome';
 import Cart from './pages/Cart';
+import CartContext from './context/CartContext';
 import DeliveryLogin from './pages/DeliveryLogin';
 import AdminDashboard from './components/AdminDashboard';
 
@@ -18,6 +19,7 @@ const App = () => {
         <Route path="/signup" element={<Signup />} />
         <Route path="/home" element={<Home />} />
         <Route path="/Cart" element={<Cart />} />
+        <Route path="/CartContext" element={<CartContext />} />
         <Route path="/DeliveryLogin" element={<DeliveryLogin />} />
         <Route path="/DeliveryHome" element={<DeliveryHome />} />
         <Route path="/AdminDashboard" element={<AdminDashboard />} />
