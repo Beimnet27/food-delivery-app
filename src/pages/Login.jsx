@@ -1,17 +1,27 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
+import signIn from "../firebase/Auth/signin"; // Import the signIn function
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Add authentication logic here
-    console.log("Login successful");
-    navigate("/home"); // Redirect to Home page
+    setError(""); // Clear previous errors
+
+    try {
+      // Call the signIn function to authenticate the user
+      await signIn(email, password);
+      console.log("Login successful");
+      navigate("/home"); // Redirect to Home page on successful login
+    } catch (error) {
+      console.error("Login failed:", error.message);
+      setError("Invalid email or password. Please try again.");
+    }
   };
 
   return (
@@ -23,6 +33,9 @@ const Login = () => {
         <p className="text-center text-gray-400 mb-6">
           Login to access your account
         </p>
+        {error && (
+          <p className="text-center text-red-500 mb-4">{error}</p>
+        )}
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="block text-gray-300 mb-2" htmlFor="email">

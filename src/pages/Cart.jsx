@@ -1,12 +1,64 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { CartContext } from "../context/CartContext";
+import { doc, db, getDoc, setDoc, updateDoc } from "firebase/firestore";
 
 const Cart = () => {
-  const { cart, removeFromCart, updateQuantity } = useContext(CartContext);
+  const { cart, setCart, removeFromCart, updateQuantity } = useContext(CartContext); // Add setCart
+  const userId = "currentUserId"; // Replace with actual logic to get the current user's ID
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch cart from Firestore
+  useEffect(() => {
+    const fetchCart = async () => {
+      try {
+        const cartRef = doc(db, "carts", userId);
+        const cartDoc = await getDoc(cartRef);
+        if (cartDoc.exists()) {
+          setCart(cartDoc.data().items || []);
+        }
+      } catch (error) {
+        console.error("Error fetching cart:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCart();
+  }, [userId, setCart]);
+
+  // Save cart to Firestore
+  const saveCartToFirebase = async (updatedCart) => {
+    try {
+      const cartRef = doc(db, "carts", userId);
+      await setDoc(cartRef, { items: updatedCart }, { merge: true });
+    } catch (error) {
+      console.error("Error saving cart:", error);
+    }
+  };
+
+  // Update quantity in cart and Firestore
+  const handleUpdateQuantity = (id, newQuantity) => {
+    const updatedCart = cart.map((item) =>
+      item.id === id ? { ...item, quantity: newQuantity } : item
+    );
+    setCart(updatedCart);
+    saveCartToFirebase(updatedCart);
+  };
+
+  // Remove item from cart and Firestore
+  const handleRemoveFromCart = (id) => {
+    const updatedCart = cart.filter((item) => item.id !== id);
+    setCart(updatedCart);
+    saveCartToFirebase(updatedCart);
+  };
 
   const calculateTotal = () => {
     return cart.reduce((total, item) => total + item.price * item.quantity, 0);
   };
+
+  if (isLoading) {
+    return <p className="text-white text-center">Loading your cart...</p>;
+  }
 
   return (
     <div className="p-6 bg-gray-900 text-white">
@@ -19,17 +71,19 @@ const Cart = () => {
                 <img src={item.image} alt={item.name} className="h-16 w-16 rounded-md" />
                 <div className="flex-1 ml-4">
                   <h2 className="text-lg font-semibold">{item.name}</h2>
-                  <p className="text-gray-300">${item.price} x {item.quantity}</p>
+                  <p className="text-gray-300">
+                    ${item.price} x {item.quantity}
+                  </p>
                   <div>
                     <button
-                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                      onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
                       className="bg-gray-700 text-white py-1 px-2 rounded-md mr-2"
                       disabled={item.quantity <= 1}
                     >
                       -
                     </button>
                     <button
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                      onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
                       className="bg-gray-700 text-white py-1 px-2 rounded-md"
                     >
                       +
@@ -37,7 +91,7 @@ const Cart = () => {
                   </div>
                 </div>
                 <button
-                  onClick={() => removeFromCart(item.id)}
+                  onClick={() => handleRemoveFromCart(item.id)}
                   className="bg-red-500 text-white py-1 px-3 rounded-lg"
                 >
                   Remove
