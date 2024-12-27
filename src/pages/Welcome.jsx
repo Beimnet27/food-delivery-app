@@ -12,7 +12,7 @@ const Welcome = () => {
                 <p className="text-sm font-medium">Let&apos;s eat</p>
              </div>
              <p className="text-sm font-medium">
-                Join our Food Zone &rarr;
+                Join our Black Food &rarr;
              </p>
           </div>
           <h1 className="mt-8 text-3xl font-normal tracking-tight text-black md:text-4xl lg:text-6xl">
@@ -24,7 +24,7 @@ const Welcome = () => {
           </h1>
           <p className="mt-8 text-lg text-gray-700">
              "Satisfy your cravings, elevate your taste. Welcome to{" "}
-             <span className="font-semibold text-yellow">Food Zone</span>,
+             <span className="font-semibold text-yellow">Black Food</span>,
              where every bite is a delight!"
           </p>
           <form action="" className="flex items-start mt-8 space-x-2">

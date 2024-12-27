@@ -1,6 +1,6 @@
 // Import the Firebase modules
-import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { initializeApp, getApps } from "firebase/app";
+import { getAuth, setPersistence, browserLocalPersistence } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 // Firebase configuration
@@ -14,7 +14,7 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+// const app = initializeApp(firebaseConfig);
 //* Initialize Firebase
 let firebase_app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 
@@ -28,6 +28,6 @@ setPersistence(auth, browserLocalPersistence)
     console.error("Failed to set session persistence:", error);
   });
 // Initialize services
-const db = getFirestore(firebase_app);
-export { auth, db };
+
+export { auth };
 export default firebase_app;

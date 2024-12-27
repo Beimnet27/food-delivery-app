@@ -1,6 +1,9 @@
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from "../firebase";
-import { doc, setDoc } from "firebase/firestore";
+import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
+import { doc, getFirestore, setDoc } from "firebase/firestore";
+import firebase_app from "../config";
+
+const auth = getAuth(firebase_app);
+const db = getFirestore(firebase_app);
 
 export const signUp = async (email, password, additionalData) => {
   try {
@@ -24,3 +27,5 @@ export const signUp = async (email, password, additionalData) => {
     throw error; // Pass the error to the caller
   }
 };
+
+export default signUp;

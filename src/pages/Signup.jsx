@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import signup from "../firebase/Auth/signup";
-import { auth } from "/src/firebase/firebase.js"; // Adjust path based on your structure.
-import { doc, setDoc, db } from "firebase/firestore";
-
+import { doc, setDoc } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+import { db } from "../firebase/firestore";
+import firebase_app from "../firebase/config";
+const auth = getAuth(firebase_app);
 const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

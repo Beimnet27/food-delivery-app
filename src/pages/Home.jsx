@@ -1,8 +1,8 @@
 import { useContext, useEffect, useState } from "react";
 import { CartContext } from "../context/CartContext";
 import Navbar from "../components/Navbar";
-import { doc, db, getDoc } from "firebase/firestore";
-
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../firebase/firestore";
 const Home = () => {
   const { addToCart } = useContext(CartContext);
   const [userName, setUserName] = useState(""); // State to store the user's name

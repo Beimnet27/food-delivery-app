@@ -25,7 +25,7 @@ const Navbar = () => {
         {/* Logo */}
         <Link to="/Login" className="flex items-center">
           <span className="text-lg lg:text-2xl font-bold tracking-wide">
-            Food<span className="text-yellow-500">Zone</span>
+            Black<span className="text-accent">Food</span>
           </span>
         </Link>
 
@@ -50,8 +50,17 @@ const Navbar = () => {
         {/* Sign-in Button */}
         <div className="hidden lg:block">
           <Link to="/Login">
-            <button className="px-4 py-2 bg-yellow-500 text-black font-semibold rounded-md transition hover:bg-yellow-600">
+            <button className="px-4 py-2 bg-accent text-black font-semibold rounded-md transition hover:bg-yellow-600">
               Sign In
+            </button>
+          </Link>
+        </div>
+
+        {/*Sign up Button */}
+        <div className="hidden lg:block">
+        <Link to="/Signup">
+            <button className="px-4 py-2 bg-accent text-black font-semibold rounded-md transition hover:bg-yellow-600">
+              Sign Up
             </button>
           </Link>
         </div>
@@ -84,7 +93,7 @@ const Navbar = () => {
                 {item.name}
               </Link>
             ))}
-            <Link to="/signIn">
+            <Link to="/Login">
               <button
                 className="px-4 py-2 bg-yellow-500 text-black font-semibold rounded-md transition hover:bg-yellow-600"
                 onClick={toggleMenu}

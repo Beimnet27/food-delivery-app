@@ -1,6 +1,6 @@
 import { createContext, useState, useEffect } from "react";
-import { doc, db, getDoc, setDoc } from "firebase/firestore";
-
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { db } from "../firebase/firestore";
 export const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
@@ -74,3 +74,5 @@ export const CartProvider = ({ children }) => {
     </CartContext.Provider>
   );
 };
+
+export default CartProvider;
