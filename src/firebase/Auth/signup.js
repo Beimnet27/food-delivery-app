@@ -1,31 +1,48 @@
-import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
-import { doc, getFirestore, setDoc } from "firebase/firestore";
+//* Import firebase_app from config.js, signInWithEmailAndPassword, and getAuth from firebase/auth
 import firebase_app from "../config";
+import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
+import { getFirestore, setDoc, doc } from "firebase/firestore";
 
+//* Initialize Firebase
 const auth = getAuth(firebase_app);
 const db = getFirestore(firebase_app);
 
-export const signUp = async (email, password, additionalData) => {
-  try {
-    // Create user with email and password
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
+//* Sign up (create user)
+const signUp = async (email, password, fullName, phoneNumber, address) => {
+  let result = null,
+    error = null;
 
-    // Save additional user data in Firestore
-    await setDoc(doc(db, "users", user.uid), {
-      fullname: additionalData.fullname,
-      address: additionalData.address,
-      phone: additionalData.phone,
+  try {
+    console.log("Attempting to create user...");
+    result = await createUserWithEmailAndPassword(auth, email, password);
+    console.log("User created:", result);
+
+    //* Get user details
+    const user = result?.user;
+
+    if (!user) {
+      throw new Error("User object is undefined after signup.");
+    }
+
+    //* Store user details in Firestore
+    console.log("Storing user details in Firestore...");
+    await setDoc(doc(db, "Users", user.uid), {
       email: user.email,
+      user_id: user.uid,
+      full_name: fullName,
+      phone_number: phoneNumber,
+      address: address,
       createdAt: new Date(),
     });
 
-    console.log("Signup successful:", user.uid);
-    return user;
-  } catch (error) {
-    console.error("Error signing up:", error.message);
-    throw error; // Pass the error to the caller
+    console.log("User details stored successfully.");
+  } catch (e) {
+    //! Handle errors here
+    console.error("Error during signup:", e);
+    error = e;
   }
+
+  return { result, error };
 };
 
 export default signUp;

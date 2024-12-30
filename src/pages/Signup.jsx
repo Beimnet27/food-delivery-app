@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import signup from "../firebase/Auth/signup";
+import signUp from "../firebase/Auth/signup";
 import { doc, setDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { db } from "../firebase/firestore";
 import firebase_app from "../firebase/config";
 const auth = getAuth(firebase_app);
+
 const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -21,7 +22,12 @@ const Signup = () => {
 
     try {
       // Create user in Firebase Authentication
-      const userCredential = await signup(auth, email, password);
+      const userCredential = await signUp(email, password,
+        name,
+        phone,
+        address,
+      );
+      
       const user = userCredential.user;
 
       // Add additional user details to Firestore

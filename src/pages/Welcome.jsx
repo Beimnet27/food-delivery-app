@@ -55,12 +55,6 @@ const Welcome = () => {
              alt=""
           />
        </div>
-        <Link to="/login">
-          <button style={{ margin: '0.5rem', padding: '0.5rem 1rem' }}>Login</button>
-        </Link>
-        <Link to="/signup">
-          <button style={{ margin: '0.5rem', padding: '0.5rem 1rem' }}>Sign Up</button>
-        </Link>
       </div>
     </div>
   );
