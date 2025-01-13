@@ -1,33 +1,10 @@
 import { useContext, useEffect, useState } from "react";
 import { CartContext } from "../context/CartContext";
 import Navbar from "../components/Navbar";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "../firebase/firestore";
+import { useAuthContext } from "../context/AuthContext";
 const Home = () => {
   const { addToCart } = useContext(CartContext);
-  const [userName, setUserName] = useState(""); // State to store the user's name
-  const userId = "currentUserId"; // Replace with actual logic to get the current user's ID
-
-  // Fetch user data from Firestore
-  useEffect(() => {
-    const fetchUserName = async () => {
-      try {
-        const userRef = doc(db, "telegramUsers", userId.toString());
-        const userDoc = await getDoc(userRef);
-        if (userDoc.exists()) {
-          const userData = userDoc.data();
-          setUserName(userData.name); // Assuming 'name' is the field storing the user's name
-        } else {
-          console.log("No such user document found!");
-        }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-      }
-    };
-
-    fetchUserName();
-  }, [userId]);
-
+  const { userName } = useAuthContext();
   const quickEats = [
     { id: 1, name: "Pizza Margherita", price: 10, image: "/PizzaMargherita.jpg" },
     { id: 2, name: "Classic Burger", price: 8, image: "/ClassicBurger.jpg" },
@@ -48,7 +25,7 @@ const Home = () => {
     { id: 14, name: "Tacos", price: 8, image: "/Tacos.jpg" },
     { id: 15, name: "Cheesecake", price: 6, image: "/Cheesecake.webp" },
   ];
-
+  console.log(userName);
   const renderFoodCards = (foods) => (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
       {foods.map((food) => (
