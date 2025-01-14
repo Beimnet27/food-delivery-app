@@ -1,10 +1,45 @@
 import { useState, useEffect } from "react";
+import { NavLink } from 'react-router-dom';
+
+  const linksTo = [
+    {
+        link: '/dashboardAdx/usersList',
+        title: 'Customers List',
+    },
+    {
+        link: '/dashboardAdx/deliveryperson',
+        title: 'Delivery Persons List',
+    },
+    {
+        link: '/dashboardAdx/orderslist',
+        title: 'New Orders',
+    },
+    {
+        link: '/dashboardAdx/statsics',
+        title: 'Statistics',
+    }
+] 
 
 const AdminDashboard = () => {
   const [customers, setCustomers] = useState([]);
   const [deliveryPersons, setDeliveryPersons] = useState([]);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (pageRoute.pathname === '/dashboardAdx/usersList') {
+        setPageTitle('Users List')
+    } else if (pageRoute.pathname === '/dashboardAdx/deliveryperson') {
+        setPageTitle('Delivery Persons')
+    } else if (pageRoute.pathname === '/dashboardAdx/orderslist') {
+        setPageTitle('Orders List')
+    } else if (pageRoute.pathname === '/dashboardAdx/statsics') {
+        setPageTitle('Resturant Statistics')
+    } else {
+        setPageTitle('Users list')
+        
+    }
+}, [pageRoute.pathname])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -136,6 +171,21 @@ const AdminDashboard = () => {
             ))}
           </ul>
         </section>
+        <div className="flex flex-col space-y-3 w-full pt-8">
+                      {linksTo.map((menu, index) => (
+                        <NavLink
+                          to={menu.link}
+                          onClick={() => setShowMenu(false)}
+                          key={index}
+                          className={`${
+                            pageRoute.pathname === menu.link ? 'bg-[#424242]' : ''
+                          } px-2 py-3 flex rounded-[6px] items-center space-x-1 font-medium`}
+                        >
+                          <span>{menu.title}</span>
+                        </NavLink>
+                      ))}
+                      {/* <LogoutButton /> */}
+                    </div>
       </div>
     </div>
   );

@@ -23,6 +23,41 @@ const App = () => {
         <Route path="/DeliveryLogin" element={<DeliveryLogin />} />
         <Route path="/DeliveryHome" element={<DeliveryHome />} />
         <Route path="/AdminDashboard" element={<AdminDashboard />} />
+        {
+    path: "/dashboardAdx",
+    element: <Dashboard />, // Also accessible on desktop
+    errorElement: <ErrorCom />,
+    children: [
+      {
+        path: "/dashboardAdx/broadcast",
+        element: <Broadcast />,
+      },
+      {
+        path: "/dashboardAdx/managetasks",
+        element: <EditTasks />,
+      },
+      {
+        path: "/dashboardAdx/externaltasks",
+        element: <ExtrenalTasks />,
+      },
+      {
+        path: "/dashboardAdx/youtube",
+        element: <AdminYoutube />,
+      },
+      {
+        path: "/dashboardAdx/wallets",
+        element: <AirdropWallets />,
+      },
+      {
+        path: "/dashboardAdx/search",
+        element: <Search />,
+      },
+      {
+        path: "/dashboardAdx/stats",
+        element: <Statistics />,
+      },
+    ],
+  },
       </Routes>
     </Router>
   );

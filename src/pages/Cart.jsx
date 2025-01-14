@@ -63,7 +63,7 @@ const Cart = () => {
   }
 
   return (
-    <div className="p-6 bg-gray-900 text-white">
+    <div className="p-6 text-black">
       <h1 className="text-3xl font-bold text-green-400 mb-6">Your Cart</h1>
       {cart.length > 0 ? (
         <div>
@@ -73,7 +73,7 @@ const Cart = () => {
                 <img src={item.image} alt={item.name} className="h-16 w-16 rounded-md" />
                 <div className="flex-1 ml-4">
                   <h2 className="text-lg font-semibold">{item.name}</h2>
-                  <p className="text-gray-300">
+                  <p className="text-black">
                     ${item.price} x {item.quantity}
                   </p>
                   <div>
