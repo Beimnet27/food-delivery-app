@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import { CartContext } from "../context/CartContext";
 import Navbar from "../components/Navbar";
 import { useAuthContext } from "../context/AuthContext";
@@ -25,7 +25,7 @@ const Home = () => {
     { id: 14, name: "Tacos", price: 8, image: "/Tacos.jpg" },
     { id: 15, name: "Cheesecake", price: 6, image: "/Cheesecake.webp" },
   ];
-  console.log(userName);
+
   const renderFoodCards = (foods) => (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
       {foods.map((food) => (
@@ -35,7 +35,7 @@ const Home = () => {
         >
           {/* Food Image */}
           <div
-            className="h-40 bg-cover bg-center"
+            className="h-60 bg-cover bg-center"
             style={{ backgroundImage: `url(${food.image})` }}
             aria-label={food.name}
           ></div>
@@ -61,12 +61,12 @@ const Home = () => {
   );
 
   return (
-    <div className="bg-gray-900 text-white min-h-screen">
+    <div className=" min-h-screen">
       <Navbar />
       <header className="text-center py-10">
         <h1 className="text-5xl font-bold text-accent">BlackMax Restaurant</h1>
-        {userName && <p className="text-lg italic mt-4 text-gray-300">Welcome, {userName}!</p>}
-        <p className="text-lg italic mt-4 text-gray-300">Bringing flavor to your table!</p>
+        {userName && <p className="text-lg italic mt-4 text-secondary">Welcome, {userName}!</p>}
+        <p className="text-lg italic mt-4 text-secondary">Bringing flavor to your table!</p>
       </header>
 
       {/* Quick Eats Section */}
@@ -81,7 +81,7 @@ const Home = () => {
         {renderFoodCards(dailyDelights)}
       </section>
 
-      <footer className="mt-16 py-4 text-center text-gray-500 text-sm">
+      <footer className="mt-16 py-4 text-center text-secondary text-sm">
         &copy; {new Date().getFullYear()} BlackMax Restaurant. All rights reserved.
       </footer>
     </div>

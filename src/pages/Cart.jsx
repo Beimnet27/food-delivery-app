@@ -1,10 +1,12 @@
 import { useContext, useEffect, useState } from "react";
 import { CartContext } from "../context/CartContext";
-import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../firebase/firestore";
+import { useAuthContext } from "../context/AuthContext";
+
 const Cart = () => {
   const { cart, setCart, removeFromCart, updateQuantity } = useContext(CartContext); // Add setCart
-  const userId = "currentUserId"; // Replace with actual logic to get the current user's ID
+  const { userId } = useAuthContext();
   const [isLoading, setIsLoading] = useState(true);
 
   // Fetch cart from Firestore
