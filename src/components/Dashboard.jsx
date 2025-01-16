@@ -3,21 +3,21 @@ import { NavLink } from 'react-router-dom';
 
   const linksTo = [
     {
-        link: '/dashboardAdx/usersList',
+        link: '/dashboardAdx/customerList',
         title: 'Customers List',
     },
     {
-        link: '/dashboardAdx/deliveryperson',
+        link: '/dashboardAdx/deliveryManagement',
         title: 'Delivery Persons List',
     },
     {
-        link: '/dashboardAdx/orderslist',
+        link: '/dashboardAdx/orderManagement',
         title: 'New Orders',
-    },
-    {
-        link: '/dashboardAdx/statsics',
-        title: 'Statistics',
     }
+    // {
+    //     link: '/dashboardAdx/statsics',
+    //     title: 'Statistics',
+    // }
 ] 
 
 const AdminDashboard = () => {

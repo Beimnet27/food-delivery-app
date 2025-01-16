@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Welcome from './pages/Welcome';
 import Login from './pages/Login';
@@ -8,7 +7,13 @@ import DeliveryHome from './pages/DeliveryHome';
 import Cart from './pages/Cart';
 import CartContext from './context/CartContext';
 import DeliveryLogin from './pages/DeliveryLogin';
-import AdminDashboard from './components/AdminDashboard';
+//import AdminDashboard from './components/Dashboard';
+import Dashboard from './components/Dashboard'; // Import Dashboard and its children components
+//import Broadcast from './components/Broadcast';
+import customerList from './components/customerList';
+import deliveryManagement from './components/deliveryManagement';
+import orderManagement from './components/orderManagement';
+//import ErrorCom from './components/ErrorCom';
 
 const App = () => {
   return (
@@ -18,46 +23,18 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/home" element={<Home />} />
-        <Route path="/Cart" element={<Cart />} />
-        <Route path="/CartContext" element={<CartContext />} />
-        <Route path="/DeliveryLogin" element={<DeliveryLogin />} />
-        <Route path="/DeliveryHome" element={<DeliveryHome />} />
-        <Route path="/AdminDashboard" element={<AdminDashboard />} />
-        {
-    path: "/dashboardAdx",
-    element: <Dashboard />, // Also accessible on desktop
-    errorElement: <ErrorCom />,
-    children: [
-      {
-        path: "/dashboardAdx/broadcast",
-        element: <Broadcast />,
-      },
-      {
-        path: "/dashboardAdx/managetasks",
-        element: <EditTasks />,
-      },
-      {
-        path: "/dashboardAdx/externaltasks",
-        element: <ExtrenalTasks />,
-      },
-      {
-        path: "/dashboardAdx/youtube",
-        element: <AdminYoutube />,
-      },
-      {
-        path: "/dashboardAdx/wallets",
-        element: <AirdropWallets />,
-      },
-      {
-        path: "/dashboardAdx/search",
-        element: <Search />,
-      },
-      {
-        path: "/dashboardAdx/stats",
-        element: <Statistics />,
-      },
-    ],
-  },
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/cart-context" element={<CartContext />} />
+        <Route path="/delivery-login" element={<DeliveryLogin />} />
+        <Route path="/delivery-home" element={<DeliveryHome />} />
+        <Route path="/admin-dashboard" element={<AdminDashboard />} />
+        
+        {/* Nested Routes for Dashboard */}
+        <Route path="/dashboard" element={<Dashboard />} errorElement={<ErrorCom />}>
+          <Route path="customerList" element={<customerList />} />
+          <Route path="deliveryManagement" element={<deliveryManagement />} />
+          <Route path="orderManagement" element={<orderManagement />} />
+        </Route>
       </Routes>
     </Router>
   );

@@ -2,7 +2,7 @@ import { useState, useEffect, useContext, createContext } from "react";
 import { onAuthStateChanged, getAuth } from "firebase/auth";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
 import firebase_app from "../firebase/config";
-import logout from "../firebase/auth/logout";
+//import logout from "../firebase/auth/logout";
 
 const auth = getAuth(firebase_app);
 const db = getFirestore(firebase_app);
