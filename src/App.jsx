@@ -10,9 +10,9 @@ import DeliveryLogin from './pages/DeliveryLogin';
 //import AdminDashboard from './components/Dashboard';
 import Dashboard from './components/Dashboard'; // Import Dashboard and its children components
 //import Broadcast from './components/Broadcast';
-import customerList from './components/customerList';
-import deliveryManagement from './components/deliveryManagement';
-import orderManagement from './components/orderManagement';
+import CustomerList from './components/customerList';
+import DeliveryManagement from './components/deliveryManagement';
+import OrderManagement from './components/orderManagement';
 //import ErrorCom from './components/ErrorCom';
 
 const App = () => {
@@ -27,13 +27,13 @@ const App = () => {
         <Route path="/cart-context" element={<CartContext />} />
         <Route path="/delivery-login" element={<DeliveryLogin />} />
         <Route path="/delivery-home" element={<DeliveryHome />} />
-        <Route path="/admin-dashboard" element={<AdminDashboard />} />
-        
+  
         {/* Nested Routes for Dashboard */}
-        <Route path="/dashboard" element={<Dashboard />} errorElement={<ErrorCom />}>
-          <Route path="customerList" element={<customerList />} />
-          <Route path="deliveryManagement" element={<deliveryManagement />} />
-          <Route path="orderManagement" element={<orderManagement />} />
+        <Route path="/dashboard" element={<Dashboard />} >
+        {/* // errorElement={<ErrorCom />}> */}
+          <Route path="customerList" element={<CustomerList />} />
+          <Route path="deliveryManagement" element={<DeliveryManagement />} />
+          <Route path="orderManagement" element={<OrderManagement />} />
         </Route>
       </Routes>
     </Router>
