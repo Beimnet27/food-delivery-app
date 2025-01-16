@@ -4,7 +4,7 @@ import { db } from "../firebase/firestore";
 import { useAuthContext } from "../context/AuthContext";
 
 export const CartContext = createContext();
-
+ss
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
   const { userId } = useAuthContext();
@@ -15,6 +15,7 @@ export const CartProvider = ({ children }) => {
       try {
         const cartRef = doc(db, "carts", userId);
         const cartDoc = await getDoc(cartRef);
+        
         if (cartDoc.exists()) {
           setCart(cartDoc.data().items || []);
         }
