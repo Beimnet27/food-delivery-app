@@ -1,21 +1,27 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from "react";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../firebase/firestore";
 
-const orderManagement = () => {
+const OrderManagement = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const response = await fetch('/api/orders');
-        setOrders(await response.json());
-      } catch (error) {
-        console.error('Error fetching orders:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchOrders = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "Orders"));
+      const orderData = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setOrders(orderData);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchOrders();
   }, []);
 
@@ -23,11 +29,11 @@ const orderManagement = () => {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-4">Order Management</h2>
+      <h1>Order Management</h1>
       <ul>
         {orders.map((order) => (
-          <li key={order.id} className="mb-2">
-            Order #{order.id} - {order.state}
+          <li key={order.id}>
+            Order #{order.id}: {order.status}
           </li>
         ))}
       </ul>
@@ -35,4 +41,4 @@ const orderManagement = () => {
   );
 };
 
-export default orderManagement;
+export default OrderManagement;

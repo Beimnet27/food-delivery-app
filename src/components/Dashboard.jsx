@@ -17,57 +17,50 @@ const linksTo = [
 ];
 
 const AdminDashboard = () => {
-
-  const [customers, setCustomers] = useState([]);
-  const [deliveryPersons, setDeliveryPersons] = useState([]);
- const [pageTitle, setPageTitle] = useState();
-  const [loading, setLoading] = useState(true);
+  const [pageTitle, setPageTitle] = useState('');
   const pageRoute = useLocation();
 
   useEffect(() => {
-    if (pageRoute.pathname === '/dashboard/customerList') {
-        setPageTitle('Users List')
-    } else if (pageRoute.pathname === '/dashboard/deliveryManagement') {
-        setPageTitle('Delivery Persons')
-    } else if (pageRoute.pathname === '/dashboard/orderManagement') {
-        setPageTitle('Orders List')
-    }
-    // } else if (pageRoute.pathname === '/dashboard/statsics') {
-    //     setPageTitle('Resturant Statistics')
-    // } else {
-    //     setPageTitle('Users list')
-        
-    // }
-}, [pageRoute.pathname])
+    // Dynamically update the page title based on route
+    const currentPage = linksTo.find((menu) => menu.link === pageRoute.pathname);
+    setPageTitle(currentPage?.title || 'Admin Dashboard');
+  }, [pageRoute.pathname]);
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
-      <div className="flex">
-        {/* Sidebar Menu */}
-        <div className="w-1/4 p-4 border-r">
-          <nav className="flex flex-col space-y-3">
-            {linksTo.map((menu, index) => (
-              <NavLink
-                to={menu.link}
-                key={index}
-                className={({ isActive }) =>
-                  `px-4 py-2 rounded ${
-                    isActive ? 'bg-gray-800 text-white' : 'hover:bg-gray-100'
-                  }`
-                }
-              >
-                {menu.title}
-              </NavLink>
-            ))}
-          </nav>
-        </div>
+    <div className="min-h-screen flex bg-gray-100">
+      {/* Sidebar */}
+      <aside className="w-1/4 bg-white shadow-lg p-6">
+        <h1 className="text-2xl font-bold text-gray-800 mb-6">Admin Dashboard</h1>
+        <nav className="space-y-4">
+          {linksTo.map((menu, index) => (
+            <NavLink
+              to={menu.link}
+              key={index}
+              className={({ isActive }) =>
+                `block px-4 py-2 rounded-lg font-medium ${
+                  isActive
+                    ? 'bg-gray-800 text-white'
+                    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                }`
+              }
+            >
+              {menu.title}
+            </NavLink>
+          ))}
+        </nav>
+      </aside>
 
-        {/* Content Area */}
-        <div className="w-3/4 p-4">
+      {/* Main Content */}
+      <main className="w-3/4 p-6">
+        {/* Page Title */}
+        <div className="mb-6">
+          <h2 className="text-3xl font-semibold text-gray-800">{pageTitle}</h2>
+        </div>
+        {/* Content Outlet */}
+        <div className="bg-white shadow-md rounded-lg p-6">
           <Outlet />
         </div>
-      </div>
+      </main>
     </div>
   );
 };

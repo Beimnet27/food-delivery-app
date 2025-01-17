@@ -4,7 +4,6 @@ import { db } from "../firebase/firestore";
 import { useAuthContext } from "../context/AuthContext";
 
 export const CartContext = createContext();
-ss
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
   const { userId } = useAuthContext();
