@@ -32,6 +32,7 @@ const signUp = async (email, password, fullName, phoneNumber, address) => {
       full_name: fullName,
       phone_number: phoneNumber,
       address: address,
+      role: "customer",
       createdAt: new Date(),
     });
 

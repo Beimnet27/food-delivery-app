@@ -25,12 +25,12 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
       <div className="w-full max-w-md bg-[#00000042] backdrop-blur-[6px] rounded-lg shadow-lg p-8">
-        <h2 className="text-3xl font-bold text-center text-accent mb-6">
+        <h2 className="text-3xl bg-black font-bold text-center text-accent mb-6">
           Welcome Back
         </h2>
-        <p className="text-center text-gray-400 mb-6">
+        <p className="text-center text-black mb-6">
           Login to access your account
         </p>
         {error && (
@@ -38,7 +38,7 @@ const Login = () => {
         )}
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-gray-300 mb-2" htmlFor="email">
+            <label className="block text-black mb-2" htmlFor="email">
               Email
             </label>
             <input
@@ -48,11 +48,11 @@ const Login = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-2 rounded-lg bg-gray-700 text-gray-300 focus:outline-none focus:ring-2 focus:ring-accent"
+              className="w-full px-4 py-2 rounded-lg bg-gray-100 text-black focus:outline-none focus:ring-2 focus:ring-accent"
             />
           </div>
           <div className="mb-6">
-            <label className="block text-gray-300 mb-2" htmlFor="password">
+            <label className="block text-black mb-2" htmlFor="password">
               Password
             </label>
             <input
@@ -62,7 +62,7 @@ const Login = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-4 py-2 rounded-lg bg-gray-700 text-gray-300 focus:outline-none focus:ring-2 focus:ring-accent"
+              className="w-full px-4 py-2 rounded-lg bg-gray-100 text-black focus:outline-none focus:ring-2 focus:ring-accent"
             />
           </div>
           <button
@@ -72,9 +72,9 @@ const Login = () => {
             Login
           </button>
         </form>
-        <p className="text-center text-gray-400 mt-4">
+        <p className="text-center text-black mt-4">
           Don't have an account?{" "}
-          <Link to="/signup" className="text-accent cursor-pointer hover:underline">
+          <Link to="/signup" className="text-accent bg-black cursor-pointer hover:underline">
             Sign Up
           </Link>
         </p>

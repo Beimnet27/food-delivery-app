@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Welcome from './pages/Welcome';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import AdminLogin from './pages/AdminLogin';
 import Home from './pages/Home';
 import DeliveryHome from './pages/DeliveryHome';
 import Cart from './pages/Cart';
@@ -13,6 +14,7 @@ import Dashboard from './components/Dashboard'; // Import Dashboard and its chil
 import CustomerList from './components/customerList';
 import DeliveryManagement from './components/deliveryManagement';
 import OrderManagement from './components/orderManagement';
+import PrivateRoute from './components/privateRoute';
 //import ErrorCom from './components/ErrorCom';
 
 const App = () => {
@@ -27,9 +29,15 @@ const App = () => {
         <Route path="/cart-context" element={<CartContext />} />
         <Route path="/delivery-login" element={<DeliveryLogin />} />
         <Route path="/delivery-home" element={<DeliveryHome />} />
+        <Route path="AdminLogin" element={<AdminLogin />} />
   
         {/* Nested Routes for Dashboard */}
-        <Route path="/dashboard" element={<Dashboard />} >
+        <Route path="/dashboard/*" element={
+            <PrivateRoute>
+              <Dashboard />
+            </PrivateRoute> 
+            }
+            >
         {/* // errorElement={<ErrorCom />}> */}
           <Route path="customerList" element={<CustomerList />} />
           <Route path="deliveryManagement" element={<DeliveryManagement />} />
