@@ -38,7 +38,7 @@ const CustomerList = () => {
   if (loading) return <div>Loading customers...</div>;
 
   return (
-    <div>
+    <div className="w-full flex flex-col space-y-4 h-[100vh] scroller pt-4 overflow-y-auto pb-[150px">
       <h1>Customer List</h1>
       <ul>
         {customers.map((customer) => (
