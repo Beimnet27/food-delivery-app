@@ -25,34 +25,40 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-      <div className="w-full max-w-md bg-[#00000042] backdrop-blur-[6px] rounded-lg shadow-lg p-8">
-        <h2 className="text-3xl bg-black font-bold text-center text-accent mb-6">
-          Welcome Back
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#FF914D] to-[#FF5247]">
+      <div className="w-full max-w-md bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-8">
+        <h2 className="text-4xl font-extrabold text-center text-[#FF5247] mb-4">
+          Welcome Back! 🍔
         </h2>
-        <p className="text-center text-black mb-6">
-          Login to access your account
+        <p className="text-center text-gray-600 mb-6">
+          Hungry? Login to order your favorite food!
         </p>
         {error && (
           <p className="text-center text-red-500 mb-4">{error}</p>
         )}
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-black mb-2" htmlFor="email">
-              Email
+            <label
+              className="block text-gray-700 font-medium mb-2"
+              htmlFor="email"
+            >
+              Email Address
             </label>
             <input
               type="email"
               id="email"
-              placeholder="Enter your email"
+              placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-2 rounded-lg bg-gray-100 text-black focus:outline-none focus:ring-2 focus:ring-accent"
+              className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#FF5247] focus:border-transparent"
             />
           </div>
           <div className="mb-6">
-            <label className="block text-black mb-2" htmlFor="password">
+            <label
+              className="block text-gray-700 font-medium mb-2"
+              htmlFor="password"
+            >
               Password
             </label>
             <input
@@ -62,19 +68,22 @@ const Login = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-4 py-2 rounded-lg bg-gray-100 text-black focus:outline-none focus:ring-2 focus:ring-accent"
+              className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#FF5247] focus:border-transparent"
             />
           </div>
           <button
             type="submit"
-            className="w-full py-2 bg-accent text-gray-900 font-semibold rounded-lg hover:bg-[#45A29E] transition duration-300"
+            className="w-full py-3 bg-[#FF5247] text-white font-semibold rounded-lg hover:bg-[#FF914D] transition duration-300"
           >
             Login
           </button>
         </form>
-        <p className="text-center text-black mt-4">
+        <p className="text-center text-gray-600 mt-4">
           Don't have an account?{" "}
-          <Link to="/signup" className="text-accent bg-black cursor-pointer hover:underline">
+          <Link
+            to="/signup"
+            className="text-[#FF5247] font-medium hover:underline"
+          >
             Sign Up
           </Link>
         </p>
