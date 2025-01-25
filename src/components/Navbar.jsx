@@ -73,15 +73,15 @@ const Navbar = () => {
   ];
 
   return (
-    <header className="bg-gray-900 text-white">
+    <header className="text-gray-800 bg-transparent shadow-lg">
       <div className="container mx-auto flex items-center justify-between px-6 py-4">
         {/* Logo */}
         <Link to="/home" className="flex items-center">
-          <span className="text-lg lg:text-2xl font-bold tracking-wide">
-            Black<span className="text-accent">Food</span>
+          <span className="text-lg lg:text-2xl font-extrabold tracking-wide">
+            Black<span className="text-yellow-500">Food</span>
           </span>
         </Link>
-
+  
         {/* Menu for larger screens */}
         <nav className="hidden lg:flex space-x-8">
           {menuItems.map((item) => (
@@ -94,31 +94,28 @@ const Navbar = () => {
             </Link>
           ))}
         </nav>
-
-{/* Cart Icon */}
-<Link to="/cart" className="ml-4 relative">
-          <FaShoppingCart className="text-xl transition hover:text-yellow-500" />
+  
+        {/* Cart Icon */}
+        <Link to="/cart" className="ml-4 relative">
+          <FaShoppingCart className="text-2xl transition hover:text-yellow-500" />
           {cartCount > 0 && (
-            <span className="absolute top-0 left-4 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+            <span className="absolute top-0 left-4 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-md">
               {cartCount}
             </span>
           )}
         </Link>
-
+  
         {/* Authentication Buttons */}
         <div className="hidden lg:flex space-x-4">
           {!user ? (
             <>
-              {/* Sign In Button */}
               <Link to="/Login">
-                <button className="px-4 py-2 bg-accent text-black font-semibold rounded-md transition hover:bg-yellow-600">
+                <button className="px-5 py-2 bg-yellow-500 text-black font-semibold rounded-lg shadow-md transition hover:bg-yellow-600">
                   Sign In
                 </button>
               </Link>
-
-              {/* Sign Up Button */}
               <Link to="/Signup">
-                <button className="px-4 py-2 bg-accent text-black font-semibold rounded-md transition hover:bg-yellow-600">
+                <button className="px-5 py-2 bg-yellow-500 text-black font-semibold rounded-lg shadow-md transition hover:bg-yellow-600">
                   Sign Up
                 </button>
               </Link>
@@ -126,13 +123,13 @@ const Navbar = () => {
           ) : (
             <button
               onClick={handleLogout}
-              className="px-4 py-2 bg-red-500 text-white font-semibold rounded-md transition hover:bg-red-600"
+              className="px-5 py-2 bg-red-500 text-white font-semibold rounded-lg shadow-md transition hover:bg-red-600"
             >
               Log Out
             </button>
           )}
         </div>
-
+  
         {/* Mobile Menu Icon */}
         <button
           onClick={toggleMenu}
@@ -140,16 +137,16 @@ const Navbar = () => {
           aria-label="Toggle menu"
         >
           {isMenuOpen ? (
-            <HiOutlineX className="w-6 h-6" />
+            <HiOutlineX className="w-7 h-7 transition hover:text-yellow-500" />
           ) : (
-            <HiOutlineMenu className="w-6 h-6" />
+            <HiOutlineMenu className="w-7 h-7 transition hover:text-yellow-500" />
           )}
         </button>
       </div>
-
+  
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="lg:hidden bg-gray-800">
+        <div className="lg:hidden bg-gray-800 shadow-md">
           <nav className="flex flex-col items-center space-y-4 py-4">
             {menuItems.map((item) => (
               <Link
@@ -161,23 +158,19 @@ const Navbar = () => {
                 {item.name}
               </Link>
             ))}
-
             {!user ? (
               <>
-                {/* Sign In Button */}
                 <Link to="/Login">
                   <button
-                    className="px-4 py-2 bg-yellow-500 text-black font-semibold rounded-md transition hover:bg-yellow-600"
+                    className="px-5 py-2 bg-yellow-500 text-black font-semibold rounded-lg transition hover:bg-yellow-600 shadow-md"
                     onClick={toggleMenu}
                   >
                     Sign In
                   </button>
                 </Link>
-
-                {/* Sign Up Button */}
                 <Link to="/Signup">
                   <button
-                    className="px-4 py-2 bg-yellow-500 text-black font-semibold rounded-md transition hover:bg-yellow-600"
+                    className="px-5 py-2 bg-yellow-500 text-black font-semibold rounded-lg transition hover:bg-yellow-600 shadow-md"
                     onClick={toggleMenu}
                   >
                     Sign Up
@@ -190,7 +183,7 @@ const Navbar = () => {
                   handleLogout();
                   toggleMenu();
                 }}
-                className="px-4 py-2 bg-red-500 text-white font-semibold rounded-md transition hover:bg-red-600"
+                className="px-5 py-2 bg-red-500 text-white font-semibold rounded-lg transition hover:bg-red-600 shadow-md"
               >
                 Log Out
               </button>
@@ -200,6 +193,7 @@ const Navbar = () => {
       )}
     </header>
   );
+  
 };
 
 export default Navbar;
