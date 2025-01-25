@@ -5,7 +5,7 @@ import { db } from "../firebase/firestore";
 import { useAuthContext } from "../context/AuthContext";
 
 const Cart = () => {
-  const { cart, setCart, removeFromCart, updateQuantity } = useContext(CartContext); // Add setCart
+  const { cart, setCart, removeFromCart, updateQuantity } = useContext(CartContext);
   const { userId } = useAuthContext();
   const [isLoading, setIsLoading] = useState(true);
 
@@ -58,6 +58,51 @@ const Cart = () => {
     return cart.reduce((total, item) => total + item.price * item.quantity, 0);
   };
 
+  // Chapa Payment Integration
+  const handleCheckout = () => {
+    const totalAmount = calculateTotal();
+
+    if (totalAmount <= 0) {
+      alert("Your cart is empty!");
+      return;
+    }
+
+    const paymentData = {
+      public_key: "CHAPA_PUBLIC_KEY", // Replace with your Chapa public key
+      tx_ref: `tx-${Date.now()}`,
+      amount: totalAmount,
+      currency: "ETB",
+      email: "user@example.com", // Replace with user's email
+      first_name: "John",
+      last_name: "Doe",
+      title: "Food Delivery Payment",
+      description: "Payment for food items",
+      callback_url: "http://localhost:3000/order-success", // Update this
+      return_url: "http://localhost:3000/cart",
+      customization: {
+        title: "Food Delivery Checkout",
+        description: "Thank you for shopping with us",
+        logo: "https://yourlogo.com/logo.png", // Replace with your logo
+      },
+    };
+
+    window.Chapa.checkout(paymentData);
+
+    // Listen for success
+    window.addEventListener("chapaSuccess", async () => {
+      try {
+        // Clear cart and redirect to order page
+        setCart([]);
+        const cartRef = doc(db, "carts", userId);
+        await setDoc(cartRef, { items: [] });
+        alert("Payment successful!");
+        window.location.href = "/order-success";
+      } catch (error) {
+        console.error("Error during payment success handling:", error);
+      }
+    });
+  };
+
   if (isLoading) {
     return <p className="text-white text-center">Loading your cart...</p>;
   }
@@ -103,7 +148,10 @@ const Cart = () => {
           </ul>
           <div className="text-right mt-6">
             <h3 className="text-xl font-bold">Total: ${calculateTotal()}</h3>
-            <button className="bg-green-500 text-white py-2 px-6 mt-4 rounded-lg hover:bg-green-400">
+            <button
+              onClick={handleCheckout}
+              className="bg-green-500 text-white py-2 px-6 mt-4 rounded-lg hover:bg-green-400"
+            >
               Proceed to Checkout
             </button>
           </div>
