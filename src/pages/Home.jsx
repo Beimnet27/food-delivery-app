@@ -2,9 +2,11 @@ import { useContext } from "react";
 import { CartContext } from "../context/CartContext";
 import Navbar from "../components/Navbar";
 import { useAuthContext } from "../context/AuthContext";
+
 const Home = () => {
   const { addToCart } = useContext(CartContext);
   const { userName } = useAuthContext();
+
   const quickEats = [
     { id: 1, name: "Pizza Margherita", price: 10, image: "/PizzaMargherita.jpg" },
     { id: 2, name: "Classic Burger", price: 8, image: "/ClassicBurger.jpg" },
@@ -31,26 +33,24 @@ const Home = () => {
       {foods.map((food) => (
         <div
           key={food.id}
-          className="relative bg-gray-800 border border-accent rounded-lg overflow-hidden shadow-md hover:shadow-lg transform hover:scale-105 transition duration-300"
+          className="relative bg-white border border-gray-200 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transform hover:scale-105 transition duration-300"
         >
-          {/* Food Image */}
           <div
-            className="h-60 bg-cover bg-center"
+            className="h-48 bg-cover bg-center"
             style={{ backgroundImage: `url(${food.image})` }}
             aria-label={food.name}
           ></div>
-          {/* Food Info */}
-          <div className="p-4 flex flex-col justify-between h-[180px]">
-            <h3 className="text-lg font-bold text-accent">{food.name}</h3>
-            <p className="text-gray-300 font-medium">${food.price}</p>
-            <div className="mt-4 flex justify-between">
+          <div className="p-4 flex flex-col justify-between h-40">
+            <h3 className="text-lg font-bold text-gray-800 truncate">{food.name}</h3>
+            <p className="text-lg font-medium text-green-600">${food.price}</p>
+            <div className="mt-4 flex justify-between items-center">
               <button
-                className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-400"
+                className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-400 transition duration-300"
                 onClick={() => addToCart(food)}
               >
                 Add to Cart
               </button>
-              <button className="bg-gray-700 text-gray-300 px-4 py-2 rounded-lg hover:bg-gray-600">
+              <button className="text-green-500 font-semibold hover:text-green-600 transition duration-300">
                 View Details
               </button>
             </div>
@@ -61,28 +61,33 @@ const Home = () => {
   );
 
   return (
-    <div className=" min-h-screen">
+    <div className="min-h-screen bg-gradient-to-b from-green-100 to-green-50">
       <Navbar />
-      <header className="text-center py-10">
-        <h1 className="text-5xl font-bold text-accent">BlackMax Restaurant</h1>
-        {userName && <p className="text-lg italic mt-4 text-secondary">Welcome, {userName}!</p>}
-        <p className="text-lg italic mt-4 text-secondary">Bringing flavor to your table!</p>
+      <header className="relative text-center py-20 bg-[url('/hero-bg.jpg')] bg-cover bg-center text-white">
+        <div className="bg-black bg-opacity-50 p-10 rounded-xl inline-block">
+          <h1 className="text-5xl font-extrabold">BlackMax Restaurant</h1>
+          {userName && (
+            <p className="text-lg italic mt-4">Welcome, {userName}!</p>
+          )}
+          <p className="text-lg mt-2">Bringing flavor to your table!</p>
+          <button className="mt-6 px-6 py-3 bg-green-500 text-white font-bold text-lg rounded-lg hover:bg-green-400 transition duration-300">
+            Order Now
+          </button>
+        </div>
       </header>
 
-      {/* Quick Eats Section */}
-      <section className="px-6 mb-12">
-        <h2 className="text-3xl font-semibold text-accent mb-6">Quick Eats</h2>
+      <section className="px-6 py-12">
+        <h2 className="text-3xl font-semibold text-gray-800 mb-6">Quick Eats</h2>
         {renderFoodCards(quickEats)}
       </section>
 
-      {/* Daily Delights Section */}
-      <section className="px-6">
-        <h2 className="text-3xl font-semibold text-accent mb-6">Daily Delights</h2>
+      <section className="px-6 py-12 bg-green-50">
+        <h2 className="text-3xl font-semibold text-gray-800 mb-6">Daily Delights</h2>
         {renderFoodCards(dailyDelights)}
       </section>
 
-      <footer className="mt-16 py-4 text-center text-secondary text-sm">
-        &copy; {new Date().getFullYear()} BlackMax Restaurant. All rights reserved.
+      <footer className="mt-16 py-6 text-center bg-gray-800 text-white">
+        <p className="text-sm">&copy; {new Date().getFullYear()} BlackMax Restaurant. All rights reserved.</p>
       </footer>
     </div>
   );
