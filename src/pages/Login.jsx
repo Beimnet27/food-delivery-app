@@ -25,9 +25,9 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#FF914D] to-[#FF5247]">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#FF914D] to-yellow-500">
       <div className="w-full max-w-md bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-8">
-        <h2 className="text-4xl font-extrabold text-center text-[#FF5247] mb-4">
+        <h2 className="text-4xl font-extrabold text-center text-yellow-500 mb-4">
           Welcome Back! 🍔
         </h2>
         <p className="text-center text-gray-600 mb-6">
@@ -51,7 +51,7 @@ const Login = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#FF5247] focus:border-transparent"
+              className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
             />
           </div>
           <div className="mb-6">
@@ -68,12 +68,12 @@ const Login = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#FF5247] focus:border-transparent"
+              className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
             />
           </div>
           <button
             type="submit"
-            className="w-full py-3 bg-[#FF5247] text-white font-semibold rounded-lg hover:bg-[#FF914D] transition duration-300"
+            className="w-full py-3 bg-yellow-500 text-white font-semibold rounded-lg hover:bg-[#FF914D] transition duration-300"
           >
             Login
           </button>
@@ -82,7 +82,7 @@ const Login = () => {
           Don't have an account?{" "}
           <Link
             to="/signup"
-            className="text-[#FF5247] font-medium hover:underline"
+            className="text-yellow-500 font-medium hover:underline"
           >
             Sign Up
           </Link>

@@ -1,12 +1,12 @@
 import { useContext, useEffect, useState } from "react";
 import { CartContext } from "../context/CartContext";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, addDoc, collection } from "firebase/firestore";
 import { db } from "../firebase/firestore";
 import { useAuthContext } from "../context/AuthContext";
 
 const Cart = () => {
   const { cart, setCart, removeFromCart, updateQuantity } = useContext(CartContext);
-  const { userId } = useAuthContext();
+  const { userId, userEmail, userName } = useAuthContext(); // Fetching user details
   const [isLoading, setIsLoading] = useState(true);
 
   // Fetch cart from Firestore
@@ -59,7 +59,7 @@ const Cart = () => {
   };
 
   // Chapa Payment Integration
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     const totalAmount = calculateTotal();
 
     if (totalAmount <= 0) {
@@ -67,14 +67,15 @@ const Cart = () => {
       return;
     }
 
+    // Simulated Chapa Payment Data
     const paymentData = {
       public_key: "CHAPA_PUBLIC_KEY", // Replace with your Chapa public key
       tx_ref: `tx-${Date.now()}`,
       amount: totalAmount,
       currency: "ETB",
-      email: "user@example.com", // Replace with user's email
-      first_name: "John",
-      last_name: "Doe",
+      email: userEmail,
+      first_name: userName?.split(" ")[0] || "John",
+      last_name: userName?.split(" ")[1] || "Doe",
       title: "Food Delivery Payment",
       description: "Payment for food items",
       callback_url: "http://localhost:3000/order-success", // Update this
@@ -91,11 +92,22 @@ const Cart = () => {
     // Listen for success
     window.addEventListener("chapaSuccess", async () => {
       try {
-        // Clear cart and redirect to order page
+        // Save order to Firestore
+        const ordersRef = collection(db, "orders");
+        await addDoc(ordersRef, {
+          userId,
+          cart,
+          totalAmount,
+          timestamp: new Date(),
+          status: "Paid",
+        });
+
+        // Clear cart and update Firestore
         setCart([]);
         const cartRef = doc(db, "carts", userId);
         await setDoc(cartRef, { items: [] });
-        alert("Payment successful!");
+
+        alert("Payment successful! Your order has been placed.");
         window.location.href = "/order-success";
       } catch (error) {
         console.error("Error during payment success handling:", error);
