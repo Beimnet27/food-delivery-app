@@ -8,24 +8,24 @@ const Home = () => {
   const { userName } = useAuthContext();
 
   const quickEats = [
-    { id: 1, name: "Pizza Margherita", price: 10, image: "/PizzaMargherita.jpg" },
-    { id: 2, name: "Classic Burger", price: 8, image: "/ClassicBurger.jpg" },
-    { id: 3, name: "Pasta Carbonara", price: 12, image: "/PastaCarbonara.jpg" },
-    { id: 4, name: "Caesar Salad", price: 7, image: "/CaesarSalad.jpg" },
-    { id: 5, name: "Grilled Sandwich", price: 6, image: "/GrilledSandwich.jpg" },
-    { id: 6, name: "French Fries", price: 4, image: "/FrenchFries.jpg" },
+    { id: 1, name: "Pizza Margherita", price: 100, image: "/PizzaMargherita.jpg" },
+    { id: 2, name: "Classic Burger", price: 180, image: "/ClassicBurger.jpg" },
+    { id: 3, name: "Pasta Carbonara", price: 120, image: "/PastaCarbonara.jpg" },
+    { id: 4, name: "Caesar Salad", price: 170, image: "/CaesarSalad.jpg" },
+    { id: 5, name: "Grilled Sandwich", price: 160, image: "/GrilledSandwich.jpg" },
+    { id: 6, name: "French Fries", price: 240, image: "/FrenchFries.jpg" },
   ];
 
   const dailyDelights = [
-    { id: 7, name: "BBQ Ribs", price: 15, image: "/BBQRibs.jpg" },
-    { id: 8, name: "Chicken Wings", price: 9, image: "/ChickenWings.jpg" },
-    { id: 9, name: "Vegetable Soup", price: 5, image: "/VegetableSoup.jpg" },
-    { id: 10, name: "Steak", price: 20, image: "/Steak.jpg" },
-    { id: 11, name: "Seafood Platter", price: 25, image: "/SeafoodPlatter.jpg" },
-    { id: 12, name: "Veggie Burger", price: 9, image: "/VeggieBurger.jpg" },
-    { id: 13, name: "Fruit Smoothie", price: 5, image: "/FruitSmoothie.jpg" },
-    { id: 14, name: "Tacos", price: 8, image: "/Tacos.jpg" },
-    { id: 15, name: "Cheesecake", price: 6, image: "/Cheesecake.webp" },
+    { id: 7, name: "BBQ Ribs", price: 415, image: "/BBQRibs.jpg" },
+    { id: 8, name: "Chicken Wings", price: 599, image: "/ChickenWings.jpg" },
+    { id: 9, name: "Vegetable Soup", price: 150, image: "/VegetableSoup.jpg" },
+    { id: 10, name: "Steak", price: 520, image: "/Steak.jpg" },
+    { id: 11, name: "Seafood Platter", price: 250, image: "/SeafoodPlatter.jpg" },
+    { id: 12, name: "Veggie Burger", price: 199, image: "/VeggieBurger.jpg" },
+    { id: 13, name: "Fruit Smoothie", price: 250, image: "/FruitSmoothie.jpg" },
+    { id: 14, name: "Tacos", price: 180, image: "/Tacos.jpg" },
+    { id: 15, name: "Cheesecake", price: 460, image: "/Cheesecake.webp" },
   ];
 
   const renderFoodCards = (foods) => (
@@ -42,7 +42,7 @@ const Home = () => {
           ></div>
           <div className="p-4 flex flex-col justify-between h-40">
             <h3 className="text-lg font-bold text-gray-800 truncate">{food.name}</h3>
-            <p className="text-lg font-medium text-green-600">${food.price}</p>
+            <p className="text-lg font-medium text-green-600">{food.price} ETB</p>
             <div className="mt-4 flex justify-between items-center">
               <button
                 className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-400 transition duration-300"
