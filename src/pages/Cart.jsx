@@ -76,6 +76,7 @@ const Cart = () => {
   };
 
   const handleCheckout = async () => {
+    // Calculate the total payment amount
     const totalAmount = calculateTotal();
   
     if (totalAmount <= 0) {
@@ -83,16 +84,24 @@ const Cart = () => {
       return;
     }
   
+    // Ensure user email and name are available
+    if (!userEmail || !userName) {
+      alert("Please make sure your user details (name and email) are provided.");
+      return;
+    }
+  
+    // Prepare payment data
     const paymentData = {
-      amount: totalAmount.toString(),
-      currency: "ETB",
+      amount: totalAmount.toFixed(2), // Ensure amount has two decimal points
+      currency: "ETB", // Currency for the transaction
       email: userEmail,
-      first_name: userName?.split(" ")[0] || "John",
-      last_name: userName?.split(" ")[1] || "Doe",
-      callback_url: "http://localhost:3000/", // Update as needed
+      first_name: userName?.split(" ")[0] || "John", // Default to "John" if no name
+      last_name: userName?.split(" ")[1] || "Doe", // Default to "Doe" if no surname
+      callback_url: "http://localhost:3000/payment-status", // Update for production
     };
   
     try {
+      // Send request to backend for payment initialization
       const response = await fetch("http://localhost:5000/api/initialize-payment", {
         method: "POST",
         headers: {
@@ -102,16 +111,21 @@ const Cart = () => {
       });
   
       const result = await response.json();
-      if (result.checkout_url) {
+  
+      if (response.ok && result.checkout_url) {
         // Redirect user to Chapa payment page
         window.location.href = result.checkout_url;
       } else {
-        alert("Failed to initialize payment.");
+        console.error("Payment Initialization Error:", result);
+        alert(result.error || "Failed to initialize payment. Please try again.");
       }
     } catch (error) {
+      // Log and display any unexpected errors
       console.error("Error initializing payment:", error);
+      alert("An unexpected error occurred. Please try again later.");
     }
-  };  
+  };
+  
 
   if (isLoading) {
     return <p className="text-white text-center">Loading your cart...</p>;

@@ -5,7 +5,7 @@ const app = express();
 const PORT = 5000;
 
 // Replace with your actual Chapa secret key
-const CHAPA_SECRET_KEY = "your-secret-key";
+const CHAPA_SECRET_KEY = "CHASECK_TEST-eQFHr5G29lA3Ru5SiyrOpyBapsdhr2cf";
 const myChapa = new Chapa(CHAPA_SECRET_KEY);
 
 // Middleware to parse JSON requests
