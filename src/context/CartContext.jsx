@@ -4,19 +4,26 @@ import { db } from "../firebase/firestore";
 import { useAuthContext } from "../context/AuthContext";
 
 export const CartContext = createContext();
+
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
   const { userId } = useAuthContext();
 
-  // Fetch cart from Firestore when the context initializes
   useEffect(() => {
     const fetchCart = async () => {
+      if (!userId) {
+        console.error("Error: userId is null or undefined. Cannot fetch cart.");
+        return;
+      }
+
       try {
         const cartRef = doc(db, "carts", userId);
         const cartDoc = await getDoc(cartRef);
-        
+
         if (cartDoc.exists()) {
           setCart(cartDoc.data().items || []);
+        } else {
+          console.warn(`No cart found for userId: ${userId}`);
         }
       } catch (error) {
         console.error("Error fetching cart from Firestore:", error);
@@ -26,8 +33,12 @@ export const CartProvider = ({ children }) => {
     fetchCart();
   }, [userId]);
 
-  // Save cart to Firestore
   const saveCartToFirebase = async (updatedCart) => {
+    if (!userId) {
+      console.error("Error: userId is null or undefined. Cannot save cart.");
+      return;
+    }
+
     try {
       const cartRef = doc(db, "carts", userId);
       await setDoc(cartRef, { items: updatedCart }, { merge: true });
@@ -71,7 +82,9 @@ export const CartProvider = ({ children }) => {
   };
 
   return (
-    <CartContext.Provider value={{ cart, setCart, addToCart, removeFromCart, updateQuantity }}>
+    <CartContext.Provider
+      value={{ cart, setCart, addToCart, removeFromCart, updateQuantity }}
+    >
       {children}
     </CartContext.Provider>
   );
