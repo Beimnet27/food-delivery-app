@@ -11,16 +11,16 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [user, setUser] = useState(null); // Track the logged-in user
   const navigate = useNavigate();
-  const { userId } = useAuthContext();
+  const { user_id } = useAuthContext();
   const auth = getAuth(); // Initialize Firebase auth
   const [cartCount, setCartCount] = useState(0); // State to track cart count
 
   useEffect(() => {
     const fetchCart = async () => {
-      if (!userId || !userId) return; // Ensure user and user ID are available
+      if (!user_id || !user_id) return; // Ensure user and user ID are available
   
       try {
-        const cartRef = doc(db, "carts", userId); // Use user.id as the document ID
+        const cartRef = doc(db, "carts", user_id); // Use user.id as the document ID
         const cartDoc = await getDoc(cartRef);
         if (cartDoc.exists()) {
           const cart = cartDoc.data().items || [];
@@ -36,7 +36,7 @@ const Navbar = () => {
     };
   
     fetchCart();
-  }, [userId]);
+  }, [user_id]);
   
   
   useEffect(() => {

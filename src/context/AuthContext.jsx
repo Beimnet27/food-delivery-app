@@ -14,7 +14,7 @@ export const useAuthContext = () => useContext(AuthContext);
 export const AuthContextProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [userName, setUserName] = useState("");
-  const [userId, setUserId] = useState(null);
+  const [user_id, setuser_id] = useState(null);
   const [loading, setLoading] = useState(true);
   const [role, setRole] = useState("");
 
@@ -32,13 +32,13 @@ export const AuthContextProvider = ({ children }) => {
               email: currentUser.email,
               ...userData,
             });
-            setUserId(currentUser.uid); // Use Firebase user ID
+            setuser_id(currentUser.uid); // Use Firebase user ID
             setUserName(userData.full_name || ""); // Assuming 'full_name' field exists
             setRole(userData.role || "");
           } else {
             console.log("No such user document found!");
             setUser(currentUser); // Just set basic auth info if no Firestore doc
-            setUserId(currentUser.uid);
+            setuser_id(currentUser.uid);
             setRole("");
           }
         } catch (error) {
@@ -47,7 +47,7 @@ export const AuthContextProvider = ({ children }) => {
       } else {
         // Reset state when no user is logged in
         setUser(null);
-        setUserId(null);
+        setuser_id(null);
         setUserName("");
         setRole("");
       }
@@ -59,7 +59,7 @@ export const AuthContextProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, userName, userId, setUserId, setUserName, loading, role }}
+      value={{ user, userName, user_id, setuser_id, setUserName, loading, role }}
     >
       {children}
     </AuthContext.Provider>

@@ -6,14 +6,14 @@ import { useAuthContext } from "../context/AuthContext";
 
 const Cart = () => {
   const { cart, setCart, removeFromCart, updateQuantity } = useContext(CartContext);
-  const { userId, userEmail, userName } = useAuthContext(); // Fetching user details
+  const { user_id, userEmail, userName } = useAuthContext(); // Fetching user details
   const [isLoading, setIsLoading] = useState(true);
 
   // Fetch cart from Firestore
   useEffect(() => {
     const fetchCart = async () => {
       try {
-        const cartRef = doc(db, "carts", userId);
+        const cartRef = doc(db, "carts", user_id);
         const cartDoc = await getDoc(cartRef);
         if (cartDoc.exists()) {
           setCart(cartDoc.data().items || []);
@@ -26,12 +26,12 @@ const Cart = () => {
     };
 
     fetchCart();
-  }, [userId, setCart]);
+  }, [user_id, setCart]);
 
   // Save cart to Firestore
   const saveCartToFirebase = async (updatedCart) => {
     try {
-      const cartRef = doc(db, "carts", userId);
+      const cartRef = doc(db, "carts", user_id);
       await setDoc(cartRef, { items: updatedCart }, { merge: true });
     } catch (error) {
       console.error("Error saving cart:", error);
@@ -95,7 +95,7 @@ const Cart = () => {
         // Save order to Firestore
         const ordersRef = collection(db, "orders");
         await addDoc(ordersRef, {
-          userId,
+          user_id,
           cart,
           totalAmount,
           timestamp: new Date(),
@@ -104,7 +104,7 @@ const Cart = () => {
 
         // Clear cart and update Firestore
         setCart([]);
-        const cartRef = doc(db, "carts", userId);
+        const cartRef = doc(db, "carts", user_id);
         await setDoc(cartRef, { items: [] });
 
         alert("Payment successful! Your order has been placed.");

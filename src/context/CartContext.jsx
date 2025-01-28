@@ -7,23 +7,23 @@ export const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
-  const { userId } = useAuthContext();
+  const { user_id } = useAuthContext();
 
   useEffect(() => {
     const fetchCart = async () => {
-      if (!userId) {
-        console.error("Error: userId is null or undefined. Cannot fetch cart.");
+      if (!user_id) {
+        console.error("Error: user_id is null or undefined. Cannot fetch cart.");
         return;
       }
 
       try {
-        const cartRef = doc(db, "carts", userId);
+        const cartRef = doc(db, "carts", user_id);
         const cartDoc = await getDoc(cartRef);
 
         if (cartDoc.exists()) {
           setCart(cartDoc.data().items || []);
         } else {
-          console.warn(`No cart found for userId: ${userId}`);
+          console.warn(`No cart found for user_id: ${user_id}`);
         }
       } catch (error) {
         console.error("Error fetching cart from Firestore:", error);
@@ -31,16 +31,16 @@ export const CartProvider = ({ children }) => {
     };
 
     fetchCart();
-  }, [userId]);
+  }, [user_id]);
 
   const saveCartToFirebase = async (updatedCart) => {
-    if (!userId) {
-      console.error("Error: userId is null or undefined. Cannot save cart.");
+    if (!user_id) {
+      console.error("Error: user_id is null or undefined. Cannot save cart.");
       return;
     }
 
     try {
-      const cartRef = doc(db, "carts", userId);
+      const cartRef = doc(db, "carts", user_id);
       await setDoc(cartRef, { items: updatedCart }, { merge: true });
     } catch (error) {
       console.error("Error saving cart to Firestore:", error);
