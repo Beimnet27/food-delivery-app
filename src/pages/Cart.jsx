@@ -97,12 +97,12 @@ const Cart = () => {
       email: userEmail,
       first_name: userName?.split(" ")[0] || "John", // Default to "John" if no name
       last_name: userName?.split(" ")[1] || "Doe", // Default to "Doe" if no surname
-      callback_url: "http://localhost:3000/payment-status", // Update for production
+      callback_url: "https://bitegodelivery.netlify.app:3000/payment-status", // Update for production
     };
   
     try {
       // Send request to backend for payment initialization
-      const response = await fetch("http://localhost:5000/api/initialize-payment", {
+      const response = await fetch("https://bitegodelivery.netlify.app:5000/api/initialize-payment", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

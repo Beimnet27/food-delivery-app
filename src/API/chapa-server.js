@@ -11,7 +11,7 @@ const myChapa = new Chapa(CHAPA_SECRET_KEY);
 
 // Enable CORS for specific origins (replace with your frontend URL in production)
 app.use(cors({
-  origin: 'http://localhost:5173', // Your frontend's URL
+  origin: 'https://bitegodelivery.netlify.app:5173',
   methods: ['GET', 'POST'], // Allowed HTTP methods
   allowedHeaders: ['Content-Type'], // Allowed headers
 }));
@@ -35,7 +35,7 @@ app.post("/api/initialize-payment", async (req, res) => {
     last_name,
     callback_url,
     customization: {
-      title: "I love e-commerce",
+      title: "Black Food Delivery",
       description: "It is time to pay",
     },
   };
