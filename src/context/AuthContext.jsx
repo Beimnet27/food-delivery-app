@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext, createContext } from "react";
 import { onAuthStateChanged, getAuth } from "firebase/auth";
-import { getFirestore, doc, getDoc } from "firebase/firestore";
+import { getFirestore, doc, getDoc, collection, addDoc, getDocs, query, where, deleteDoc } from "firebase/firestore";
 import firebase_app from "../firebase/config";
 //import logout from "../firebase/auth/logout";
 
@@ -59,9 +59,39 @@ export const AuthContextProvider = ({ children }) => {
     return () => unsubscribe();
   }, []);
 
+  const moveCartToOrders = async (userId) => {
+    try {
+      // Step 1: Fetch the cart items for the user
+      const cartRef = collection(db, "cart");
+      const q = query(cartRef, where("userId", "==", userId));
+      const cartSnapshot = await getDocs(q);
+  
+      // Step 2: Add each cart item to the orders collection
+      const ordersRef = collection(db, "orders");
+      const batchPromises = cartSnapshot.docs.map(async (cartDoc) => {
+        const cartData = cartDoc.data();
+        await addDoc(ordersRef, {
+          ...cartData,
+          userId, // Ensure userId is stored
+          paymentStatus: "Paid", // Mark as paid
+          orderDate: new Date().toISOString(), // Add timestamp
+        });
+  
+        // Step 3: Remove the item from the cart collection
+        await deleteDoc(doc(db, "cart", cartDoc.id));
+      });
+  
+      await Promise.all(batchPromises);
+      console.log("Cart items moved to orders collection successfully.");
+    } catch (error) {
+      console.error("Error moving items to orders:", error);
+      throw error;
+    }
+  };
+
   return (
     <AuthContext.Provider
-      value={{ user, userName, userEmail, user_id, setuser_id, setUserName, loading, role }}
+      value={{ user, userName, userEmail, user_id, moveCartToOrders, setuser_id, setUserName, loading, role }}
     >
       {children}
     </AuthContext.Provider>

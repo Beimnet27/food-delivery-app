@@ -6,7 +6,7 @@ import { useAuthContext } from "../context/AuthContext";
 
 const Cart = () => {
   const { cart, setCart, removeFromCart, updateQuantity } = useContext(CartContext);
-  const { user_id, userEmail, userName } = useAuthContext(); // Fetching user details
+  const { user_id, userEmail, userName, moveCartToOrders } = useAuthContext(); // Fetching user details
   const [isLoading, setIsLoading] = useState(true);
 
   // Fetch cart from Firestore
