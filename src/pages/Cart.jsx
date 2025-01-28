@@ -89,11 +89,11 @@ const Cart = () => {
       email: userEmail,
       first_name: userName?.split(" ")[0] || "John",
       last_name: userName?.split(" ")[1] || "Doe",
-      callback_url: "http://localhost:3000/order-success", // Adjust as needed
+      callback_url: "http://localhost:3000/", // Update as needed
     };
   
     try {
-      const response = await fetch("http://localhost:5173/initialize-payment", {
+      const response = await fetch("http://localhost:5000/api/initialize-payment", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -103,7 +103,7 @@ const Cart = () => {
   
       const result = await response.json();
       if (result.checkout_url) {
-        // Redirect to Chapa checkout
+        // Redirect user to Chapa payment page
         window.location.href = result.checkout_url;
       } else {
         alert("Failed to initialize payment.");
@@ -111,8 +111,7 @@ const Cart = () => {
     } catch (error) {
       console.error("Error initializing payment:", error);
     }
-  };
-  
+  };  
 
   if (isLoading) {
     return <p className="text-white text-center">Loading your cart...</p>;

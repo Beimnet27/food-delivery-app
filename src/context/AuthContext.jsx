@@ -15,6 +15,7 @@ export const AuthContextProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [userName, setUserName] = useState("");
   const [user_id, setuser_id] = useState(null);
+  const [userEmail, setUserEmail] = useState("");
   const [loading, setLoading] = useState(true);
   const [role, setRole] = useState("");
 
@@ -34,6 +35,7 @@ export const AuthContextProvider = ({ children }) => {
             });
             setuser_id(currentUser.uid); // Use Firebase user ID
             setUserName(userData.full_name || ""); // Assuming 'full_name' field exists
+            setUserEmail(currentUser.email);
             setRole(userData.role || "");
           } else {
             console.log("No such user document found!");
@@ -59,7 +61,7 @@ export const AuthContextProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, userName, user_id, setuser_id, setUserName, loading, role }}
+      value={{ user, userName, userEmail, user_id, setuser_id, setUserName, loading, role }}
     >
       {children}
     </AuthContext.Provider>
