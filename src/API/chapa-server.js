@@ -1,5 +1,6 @@
 import express from "express";
 import Chapa from "chapa";
+import cors from "cors";
 
 const app = express();
 const PORT = 5000;
@@ -7,6 +8,13 @@ const PORT = 5000;
 // Replace with your actual Chapa secret key
 const CHAPA_SECRET_KEY = "CHASECK_TEST-eQFHr5G29lA3Ru5SiyrOpyBapsdhr2cf";
 const myChapa = new Chapa(CHAPA_SECRET_KEY);
+
+// Enable CORS for specific origins (replace with your frontend URL in production)
+app.use(cors({
+  origin: 'http://localhost:5173', // Your frontend's URL
+  methods: ['GET', 'POST'], // Allowed HTTP methods
+  allowedHeaders: ['Content-Type'], // Allowed headers
+}));
 
 // Middleware to parse JSON requests
 app.use(express.json());
