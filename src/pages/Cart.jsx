@@ -58,62 +58,61 @@ const Cart = () => {
     return cart.reduce((total, item) => total + item.price * item.quantity, 0);
   };
 
-  // Chapa Payment Integration
+  const loadChapaSDK = () => {
+    return new Promise((resolve, reject) => {
+      if (document.getElementById("chapa-sdk")) {
+        // SDK already loaded
+        resolve();
+        return;
+      }
+  
+      const script = document.createElement("script");
+      script.src = "https://cdn.chapa.co/checkout.js";
+      script.id = "chapa-sdk";
+      script.onload = resolve;
+      script.onerror = () => reject(new Error("Failed to load Chapa SDK"));
+      document.body.appendChild(script);
+    });
+  };
+
   const handleCheckout = async () => {
     const totalAmount = calculateTotal();
-
+  
     if (totalAmount <= 0) {
       alert("Your cart is empty!");
       return;
     }
-
-    // Simulated Chapa Payment Data
+  
     const paymentData = {
-      public_key: "CHAPA_PUBLIC_KEY", // Replace with your Chapa public key
-      tx_ref: `tx-${Date.now()}`,
-      amount: totalAmount,
+      amount: totalAmount.toString(),
       currency: "ETB",
       email: userEmail,
       first_name: userName?.split(" ")[0] || "John",
       last_name: userName?.split(" ")[1] || "Doe",
-      title: "Food Delivery Payment",
-      description: "Payment for food items",
-      callback_url: "http://localhost:3000/order-success", // Update this
-      return_url: "http://localhost:3000/cart",
-      customization: {
-        title: "Food Delivery Checkout",
-        description: "Thank you for shopping with us",
-        logo: "https://yourlogo.com/logo.png", // Replace with your logo
-      },
+      callback_url: "http://localhost:3000/order-success", // Adjust as needed
     };
-
-    window.Chapa.checkout(paymentData);
-
-    // Listen for success
-    window.addEventListener("chapaSuccess", async () => {
-      try {
-        // Save order to Firestore
-        const ordersRef = collection(db, "orders");
-        await addDoc(ordersRef, {
-          user_id,
-          cart,
-          totalAmount,
-          timestamp: new Date(),
-          status: "Paid",
-        });
-
-        // Clear cart and update Firestore
-        setCart([]);
-        const cartRef = doc(db, "carts", user_id);
-        await setDoc(cartRef, { items: [] });
-
-        alert("Payment successful! Your order has been placed.");
-        window.location.href = "/order-success";
-      } catch (error) {
-        console.error("Error during payment success handling:", error);
+  
+    try {
+      const response = await fetch("http://localhost:5173/initialize-payment", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(paymentData),
+      });
+  
+      const result = await response.json();
+      if (result.checkout_url) {
+        // Redirect to Chapa checkout
+        window.location.href = result.checkout_url;
+      } else {
+        alert("Failed to initialize payment.");
       }
-    });
+    } catch (error) {
+      console.error("Error initializing payment:", error);
+    }
   };
+  
 
   if (isLoading) {
     return <p className="text-white text-center">Loading your cart...</p>;
