@@ -115,7 +115,7 @@ const Cart = () => {
       if (response.ok && result.checkout_url) {
         // Redirect user to Chapa payment page
         window.location.href = result.checkout_url;
-        //verifyPayment(result.tx_ref);
+        verifyPayment(result.tx_ref);
       } else {
         console.error("Payment Initialization Error:", result);
         alert(result.error || "Failed to initialize payment. Please try again.");
@@ -127,28 +127,28 @@ const Cart = () => {
     }
   };
 
-  // async function verifyPayment(tx_ref) {
-  //   const response = await fetch("/api/verify-payment", {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify({ tx_ref }),
-  //   });
+  async function verifyPayment(tx_ref) {
+    const response = await fetch("/api/verify-payment", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ tx_ref }),
+    });
   
-  //   const data = await response.json();
-  //   if (response.ok) {
-  //     // Move cart items to orders collection
-  //  // await moveCartToOrders(user_id);
+    const data = await response.json();
+    if (response.ok) {
+      // Move cart items to orders collection
+    await moveCartToOrders(user_id);
 
-  //   // Redirect the user to an order confirmation page
-  //   alert("Payment successful! Your order has been placed.");
-  //   navigate("/order-confirmation"); 
-  //     console.log("Payment Verified:", data);
-  //   } else {
-  //     console.error("Error verifying payment:", data.error);
-  //   }
-  // }  
+    // Redirect the user to an order confirmation page
+    alert("Payment successful! Your order has been placed.");
+    navigate("/order-confirmation"); 
+      console.log("Payment Verified:", data);
+    } else {
+      console.error("Error verifying payment:", data.error);
+    }
+  }  
   
 
   if (isLoading) {
