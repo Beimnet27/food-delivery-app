@@ -102,7 +102,7 @@ const Cart = () => {
   
     try {
       // Send request to backend for payment initialization
-      const response = await fetch("https://fooddelivery-backend-api.onrender.com:5000/api/initialize-payment", {
+      const response = await fetch("https://fooddelivery-backend-api.onrender.com/initialize-payment", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
