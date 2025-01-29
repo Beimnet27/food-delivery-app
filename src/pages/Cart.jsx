@@ -95,8 +95,8 @@ const Cart = () => {
       amount: totalAmount.toFixed(2), // Ensure amount has two decimal points
       currency: "ETB", // Currency for the transaction
       email: userEmail,
-      first_name: userName?.split(" ")[0],
-      last_name: userName?.split(" ")[1],
+      first_name: userName?.split(" ")[0] || "",
+      last_name: userName?.split(" ")[1] || "",
       callback_url: "https://bitegodelivery.netlify.app/", // Update for production
     };
   
