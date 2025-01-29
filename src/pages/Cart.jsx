@@ -133,22 +133,18 @@ const Cart = () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ tx_ref }),
+      body: JSON.stringify({ tx_ref, userId: auth.currentUser?.uid }), // Send userId
     });
   
     const data = await response.json();
     if (response.ok) {
-      // Move cart items to orders collection
-    await moveCartToOrders(user_id);
-
-    // Redirect the user to an order confirmation page
-    alert("Payment successful! Your order has been placed.");
-    navigate("/order-confirmation"); 
+      alert("Payment successful! Your order has been placed.");
+      navigate("/");
       console.log("Payment Verified:", data);
     } else {
       console.error("Error verifying payment:", data.error);
     }
-  }  
+  }    
   
 
   if (isLoading) {

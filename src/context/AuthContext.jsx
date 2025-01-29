@@ -60,34 +60,42 @@ export const AuthContextProvider = ({ children }) => {
   }, []);
 
   const moveCartToOrders = async (userId) => {
+    if (!userId) {
+      console.error("Error: userId is undefined");
+      return;
+    }
+  
     try {
-      // Step 1: Fetch the cart items for the user
       const cartRef = collection(db, "cart");
       const q = query(cartRef, where("userId", "==", userId));
       const cartSnapshot = await getDocs(q);
   
-      // Step 2: Add each cart item to the orders collection
+      if (cartSnapshot.empty) {
+        console.log("No cart items found for user:", userId);
+        return;
+      }
+  
       const ordersRef = collection(db, "orders");
       const batchPromises = cartSnapshot.docs.map(async (cartDoc) => {
         const cartData = cartDoc.data();
         await addDoc(ordersRef, {
           ...cartData,
-          userId, // Ensure userId is stored
-          paymentStatus: "Paid", // Mark as paid
-          orderDate: new Date().toISOString(), // Add timestamp
+          userId,
+          paymentStatus: "Paid",
+          orderDate: new Date().toISOString(),
         });
   
-        // Step 3: Remove the item from the cart collection
+        // Delete item from cart
         await deleteDoc(doc(db, "cart", cartDoc.id));
       });
   
       await Promise.all(batchPromises);
-      console.log("Cart items moved to orders collection successfully.");
+      console.log("Cart moved to orders successfully for user:", userId);
     } catch (error) {
       console.error("Error moving items to orders:", error);
-      throw error;
     }
   };
+  
 
   return (
     <AuthContext.Provider
