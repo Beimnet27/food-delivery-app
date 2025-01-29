@@ -133,7 +133,7 @@ const Cart = () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ tx_ref, userId: auth.currentUser?.uid }), // Send userId
+      body: JSON.stringify({ tx_ref, userId: user_id }), // Send userId
     });
   
     const data = await response.json();
