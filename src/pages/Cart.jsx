@@ -109,7 +109,7 @@ const handleCheckout = async () => {
     if (response.ok && result.checkout_url) {
       localStorage.setItem("tx_ref", result.tx_ref); // Save transaction reference
       window.location.href = result.checkout_url;
-      //verifyPayment(result.tx_ref);
+      verifyPayment(result.tx_ref);
     } else {
       alert(result.error || "Failed to initialize payment.");
     }
@@ -130,6 +130,7 @@ const handleCheckout = async () => {
   
     const data = await response.json();
     if (response.ok) {
+      await moveCartToOrders(); // Move cart items to orders
       alert("Payment successful! Your order has been placed.");
       navigate("/");
       console.log("Payment Verified:", data);
