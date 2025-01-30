@@ -75,57 +75,49 @@ const Cart = () => {
     });
   };
 
-  const handleCheckout = async () => {
-    // Calculate the total payment amount
-    const totalAmount = calculateTotal();
-  
-    if (totalAmount <= 0) {
-      alert("Your cart is empty!");
-      return;
-    }
-  
-    // Ensure user email and name are available
-    if (!userEmail || !userName) {
-      alert("Please make sure your user details (name and email) are provided.");
-      return;
-    }
-  
-    // Prepare payment data
-    const paymentData = {
-      amount: totalAmount.toFixed(2), // Ensure amount has two decimal points
-      currency: "ETB", // Currency for the transaction
-      email: userEmail,
-      first_name: userName?.split(" ")[0] || "",
-      last_name: userName?.split(" ")[1] || "",
-      callback_url: "https://bitegodelivery.netlify.app/", // Update for production
-    };
-  
-    try {
-      // Send request to backend for payment initialization
-      const response = await fetch("https://fooddelivery-backend-api.onrender.com/api/initialize-payment", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(paymentData),
-      });
-  
-      const result = await response.json();
-  
-      if (response.ok && result.checkout_url) {
-        // Redirect user to Chapa payment page
-        window.location.href = result.checkout_url;
-        verifyPayment(result.tx_ref);
-      } else {
-        console.error("Payment Initialization Error:", result);
-        alert(result.error || "Failed to initialize payment. Please try again.");
-      }
-    } catch (error) {
-      // Log and display any unexpected errors
-      console.error("Error initializing payment:", error);
-      alert("An unexpected error occurred. Please try again later.");
-    }
+const handleCheckout = async () => {
+  const totalAmount = calculateTotal();
+
+  if (totalAmount <= 0) {
+    alert("Your cart is empty!");
+    return;
+  }
+
+  if (!userEmail || !userName) {
+    alert("Please provide user details.");
+    return;
+  }
+
+  const paymentData = {
+    amount: totalAmount.toFixed(2),
+    currency: "ETB",
+    email: userEmail,
+    first_name: userName.split(" ")[0] || "",
+    last_name: userName.split(" ")[1] || "",
+    callback_url: "https://bitegodelivery.netlify.app/",
+    return_url: `https://bitegodelivery.netlify.app/payment-success?tx_ref=${Date.now()}`, // Added return URL
   };
+
+  try {
+    const response = await fetch("https://fooddelivery-backend-api.onrender.com/api/initialize-payment", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(paymentData),
+    });
+
+    const result = await response.json();
+    if (response.ok && result.checkout_url) {
+      localStorage.setItem("tx_ref", result.tx_ref); // Save transaction reference
+      window.location.href = result.checkout_url;
+      //verifyPayment(result.tx_ref);
+    } else {
+      alert(result.error || "Failed to initialize payment.");
+    }
+  } catch (error) {
+    alert("Error initializing payment.");
+  }
+};
+
 
   async function verifyPayment(tx_ref) {
     const response = await fetch("/api/verify-payment", {

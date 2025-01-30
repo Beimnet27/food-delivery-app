@@ -29,6 +29,7 @@ const App = () => {
         <Route path="/cart-context" element={<CartContext />} />
         <Route path="/deliveryLogin" element={<DeliveryLogin />} />
         <Route path="/deliveryHome" element={<DeliveryHome />} />
+        <Route path="/payment-success" element={<PaymentSuccess />} />
         <Route path="AdminLogin" element={<AdminLogin />} />
   
         {/* Nested Routes for Dashboard */}
