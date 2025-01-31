@@ -1,13 +1,16 @@
 import { useContext, useEffect, useState } from "react";
 import { CartContext } from "../context/CartContext";
-import { doc, getDoc, setDoc, addDoc, collection } from "firebase/firestore";
+import { doc, getDoc, setDoc, collection, addDoc } from "firebase/firestore";
 import { db } from "../firebase/firestore";
 import { useAuthContext } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom"; // Ensure navigation
 
 const Cart = () => {
   const { cart, setCart, removeFromCart, updateQuantity } = useContext(CartContext);
-  const { user_id, userEmail, userName, moveCartToOrders } = useAuthContext(); // Fetching user details
+  const { user_id, userEmail, userName, moveCartToOrders } = useAuthContext();
   const [isLoading, setIsLoading] = useState(true);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const navigate = useNavigate();
 
   // Fetch cart from Firestore
   useEffect(() => {
@@ -24,7 +27,6 @@ const Cart = () => {
         setIsLoading(false);
       }
     };
-
     fetchCart();
   }, [user_id, setCart]);
 
@@ -54,94 +56,107 @@ const Cart = () => {
     saveCartToFirebase(updatedCart);
   };
 
+  // Calculate Total Price
   const calculateTotal = () => {
     return cart.reduce((total, item) => total + item.price * item.quantity, 0);
   };
 
-  const loadChapaSDK = () => {
-    return new Promise((resolve, reject) => {
-      if (document.getElementById("chapa-sdk")) {
-        // SDK already loaded
-        resolve();
-        return;
+  // Handle Checkout with Chapa
+  const handleCheckout = async () => {
+    const totalAmount = calculateTotal();
+
+    if (totalAmount <= 0) {
+      alert("Your cart is empty!");
+      return;
+    }
+
+    if (!userEmail || !userName) {
+      alert("Please provide user details.");
+      return;
+    }
+
+    setIsProcessingPayment(true); // Show loading during processing
+
+    const txRef = `chapa_${Date.now()}`;
+    const paymentData = {
+      amount: totalAmount.toFixed(2),
+      currency: "ETB",
+      email: userEmail,
+      first_name: userName.split(" ")[0] || "",
+      last_name: userName.split(" ")[1] || "",
+      callback_url: `https://bitegodelivery.netlify.app/payment-success?tx_ref=${txRef}`,
+    };
+
+    try {
+      const response = await fetch(
+        "https://fooddelivery-backend-api.onrender.com/api/initialize-payment",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(paymentData),
+        }
+      );
+
+      const result = await response.json();
+      if (response.ok && result.checkout_url) {
+        localStorage.setItem("tx_ref", txRef); // Save transaction reference
+
+        // ** Open Payment Window in New Tab **
+        window.open(result.checkout_url, "_blank");
+
+        // Start Checking Payment Verification
+        await verifyPayment(txRef);
+      } else {
+        alert(result.error || "Failed to initialize payment.");
+        setIsProcessingPayment(false);
       }
-  
-      const script = document.createElement("script");
-      script.src = "https://cdn.chapa.co/checkout.js";
-      script.id = "chapa-sdk";
-      script.onload = resolve;
-      script.onerror = () => reject(new Error("Failed to load Chapa SDK"));
-      document.body.appendChild(script);
-    });
+    } catch (error) {
+      alert("Error initializing payment.");
+      setIsProcessingPayment(false);
+    }
   };
 
-const handleCheckout = async () => {
-  const totalAmount = calculateTotal();
+  // ** Verify Payment & Move Items to Orders **
+  const verifyPayment = async (tx_ref) => {
+    try {
+      let attempts = 0;
+      let maxAttempts = 10; // Retry checking 10 times
+      let isVerified = false;
 
-  if (totalAmount <= 0) {
-    alert("Your cart is empty!");
-    return;
-  }
+      while (attempts < maxAttempts) {
+        const response = await fetch(
+          "https://fooddelivery-backend-api.onrender.com/api/verify-payment",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ tx_ref, userId: user_id }),
+          }
+        );
 
-  if (!userEmail || !userName) {
-    alert("Please provide user details.");
-    return;
-  }
+        const data = await response.json();
+        if (response.ok && data.success) {
+          await moveCartToOrders(); // Move cart items to orders
+          alert("Payment successful! Your order has been placed.");
+          setIsProcessingPayment(false);
+          navigate("/orders"); // Redirect to orders page
+          return;
+        }
 
-  const paymentData = {
-    amount: totalAmount.toFixed(2),
-    currency: "ETB",
-    email: userEmail,
-    first_name: userName.split(" ")[0] || "",
-    last_name: userName.split(" ")[1] || "",
-    callback_url: "https://bitegodelivery.netlify.app/",
-    return_url: `https://bitegodelivery.netlify.app/payment-success?tx_ref=${Date.now()}`, // Added return URL
+        attempts++;
+        await new Promise((resolve) => setTimeout(resolve, 5000)); // Wait 5 seconds before retrying
+      }
+
+      alert("Payment verification failed or took too long.");
+      setIsProcessingPayment(false);
+    } catch (error) {
+      console.error("Error verifying payment:", error);
+      setIsProcessingPayment(false);
+    }
   };
 
-  try {
-    const response = await fetch("https://fooddelivery-backend-api.onrender.com/api/initialize-payment", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(paymentData),
-    });
-
-    const result = await response.json();
-    if (response.ok && result.checkout_url) {
-      localStorage.setItem("tx_ref", result.tx_ref); // Save transaction reference
-      window.location.href = result.checkout_url;
-      verifyPayment(result.tx_ref);
-    } else {
-      alert(result.error || "Failed to initialize payment.");
-    }
-  } catch (error) {
-    alert("Error initializing payment.");
-  }
-};
-
-
-  async function verifyPayment(tx_ref) {
-    const response = await fetch("/api/verify-payment", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ tx_ref, userId: user_id }), // Send userId
-    });
-  
-    const data = await response.json();
-    if (response.ok) {
-      await moveCartToOrders(); // Move cart items to orders
-      alert("Payment successful! Your order has been placed.");
-      navigate("/");
-      console.log("Payment Verified:", data);
-    } else {
-      console.error("Error verifying payment:", data.error);
-    }
-  }    
-  
-
-  if (isLoading) {
-    return <p className="text-white text-center">Loading your cart...</p>;
+  // ** Show Loading Until Payment is Verified **
+  if (isLoading || isProcessingPayment) {
+    return <p className="text-white text-center">Processing payment... Please wait.</p>;
   }
 
   return (
@@ -188,8 +203,9 @@ const handleCheckout = async () => {
             <button
               onClick={handleCheckout}
               className="bg-green-500 text-white py-2 px-6 mt-4 rounded-lg hover:bg-green-400"
+              disabled={isProcessingPayment}
             >
-              Proceed to Checkout
+              {isProcessingPayment ? "Processing..." : "Proceed to Checkout"}
             </button>
           </div>
         </div>

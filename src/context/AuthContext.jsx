@@ -59,43 +59,45 @@ export const AuthContextProvider = ({ children }) => {
     return () => unsubscribe();
   }, []);
 
-  const moveCartToOrders = async (userId) => {
-    if (!userId) {
-      console.error("Error: userId is undefined");
-      return;
-    }
-  
-    try {
-      const cartRef = collection(db, "cart");
-      const q = query(cartRef, where("userId", "==", userId));
-      const cartSnapshot = await getDocs(q);
-  
-      if (cartSnapshot.empty) {
-        console.log("No cart items found for user:", userId);
+  async function moveCartToOrders(userId, cartItems) {
+    if (!cartItems || cartItems.length === 0) {
+        console.log("No items in cart to move");
         return;
-      }
-  
-      const ordersRef = collection(db, "orders");
-      const batchPromises = cartSnapshot.docs.map(async (cartDoc) => {
-        const cartData = cartDoc.data();
-        await addDoc(ordersRef, {
-          ...cartData,
-          userId,
-          paymentStatus: "Paid",
-          orderDate: new Date().toISOString(),
-        });
-  
-        // Delete item from cart
-        await deleteDoc(doc(db, "cart", cartDoc.id));
-      });
-  
-      await Promise.all(batchPromises);
-      console.log("Cart moved to orders successfully for user:", userId);
-    } catch (error) {
-      console.error("Error moving items to orders:", error);
     }
-  };
-  
+    
+    try {
+        const ordersRef = collection(db, "orders");
+        const batch = writeBatch(db);
+        
+        cartItems.forEach((item) => {
+            const newOrderRef = doc(ordersRef);
+            batch.set(newOrderRef, {
+                userId: userId,
+                product: item.product,
+                quantity: item.quantity,
+                price: item.price,
+                createdAt: serverTimestamp()
+            });
+        });
+
+        await batch.commit();
+        console.log("Cart moved to orders successfully");
+
+        // Clear the cart
+        const cartRef = collection(db, "cart");
+        const userCartQuery = query(cartRef, where("userId", "==", userId));
+        const cartDocs = await getDocs(userCartQuery);
+
+        cartDocs.forEach((doc) => {
+            batch.delete(doc.ref);
+        });
+
+        await batch.commit();
+        console.log("Cart cleared successfully");
+    } catch (error) {
+        console.error("Error moving cart to orders:", error);
+    }
+}
 
   return (
     <AuthContext.Provider
