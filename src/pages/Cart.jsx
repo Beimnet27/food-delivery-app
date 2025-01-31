@@ -99,10 +99,11 @@ const Cart = () => {
       const result = await response.json();
       console.log("Payment API Response:", result); // Debugging
   
-      if (response.ok && result.tx_ref && result.data.checkout_url) {
-        localStorage.setItem("tx_ref", result.tx_ref); // Store the correct transaction reference
+      // ✅ Fix: Access result.data.checkout_url instead of result.checkout_url
+      if (response.ok && result.data && result.data.checkout_url) {
+        localStorage.setItem("tx_ref", result.tx_ref); // Save transaction reference
   
-        // Open the Chapa checkout URL in a new tab
+        // Open the correct Chapa checkout URL in a new tab
         window.open(result.data.checkout_url, "_blank");
   
         // Start verification process with the correct tx_ref
@@ -116,6 +117,7 @@ const Cart = () => {
       setIsProcessingPayment(false);
     }
   };
+  
   
 
   // ** Verify Payment & Move Items to Orders **
