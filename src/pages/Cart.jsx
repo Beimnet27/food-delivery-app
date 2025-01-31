@@ -121,7 +121,8 @@ const Cart = () => {
       console.error("Error initializing payment:", error);
       setIsProcessingPayment(false);
     }
-  };  
+  };
+    
   
 
   // ** Verify Payment & Move Items to Orders **
