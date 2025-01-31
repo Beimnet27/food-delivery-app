@@ -64,29 +64,28 @@ const Cart = () => {
   // Handle Checkout with Chapa
   const handleCheckout = async () => {
     const totalAmount = calculateTotal();
-
+  
     if (totalAmount <= 0) {
       alert("Your cart is empty!");
       return;
     }
-
+  
     if (!userEmail || !userName) {
       alert("Please provide user details.");
       return;
     }
-
-    setIsProcessingPayment(true); // Show loading during processing
-
-    const txRef = `chapa_${Date.now()}`;
+  
+    setIsProcessingPayment(true);
+  
     const paymentData = {
       amount: totalAmount.toFixed(2),
       currency: "ETB",
       email: userEmail,
       first_name: userName.split(" ")[0] || "",
       last_name: userName.split(" ")[1] || "",
-      callback_url: `https://bitegodelivery.netlify.app/payment-success?tx_ref=${txRef}`,
+      callback_url: "https://bitegodelivery.netlify.app/payment-success",
     };
-
+  
     try {
       const response = await fetch(
         "https://fooddelivery-backend-api.onrender.com/api/initialize-payment",
@@ -96,25 +95,28 @@ const Cart = () => {
           body: JSON.stringify(paymentData),
         }
       );
-
+  
       const result = await response.json();
-      if (response.ok && result.checkout_url) {
-        localStorage.setItem("tx_ref", txRef); // Save transaction reference
-
-        // ** Open Payment Window in New Tab **
-        window.open(result.checkout_url, "_blank");
-
-        // Start Checking Payment Verification
-        await verifyPayment(txRef);
+      console.log("Payment API Response:", result); // Debugging
+  
+      if (response.ok && result.tx_ref && result.data.checkout_url) {
+        localStorage.setItem("tx_ref", result.tx_ref); // Store the correct transaction reference
+  
+        // Open the Chapa checkout URL in a new tab
+        window.open(result.data.checkout_url, "_blank");
+  
+        // Start verification process with the correct tx_ref
+        await verifyPayment(result.tx_ref);
       } else {
         alert(result.error || "Failed to initialize payment.");
         setIsProcessingPayment(false);
       }
     } catch (error) {
-      alert("Error initializing payment.");
+      console.error("Error initializing payment:", error);
       setIsProcessingPayment(false);
     }
   };
+  
 
   // ** Verify Payment & Move Items to Orders **
   const verifyPayment = async (tx_ref) => {
