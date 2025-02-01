@@ -98,20 +98,15 @@ const Cart = () => {
   
       const result = await response.json();
       console.log("Payment API Response:", result); // Debugging
+      console.log("Chapa Checkout URL:", result?.data?.checkout_url); // Verify URL
   
-      if (response.ok && result.data && result.data.checkout_url) {
-        localStorage.setItem("tx_ref", result.tx_ref); // Store transaction reference
+      if (response.ok && result.data?.checkout_url) {
+        localStorage.setItem("tx_ref", result.tx_ref);
   
-        // ✅ Fix: Open Chapa checkout in a new **non-blocking** tab
-        const chapaWindow = window.open("", "_blank");
+        // Open checkout directly
+        window.open(result.data.checkout_url, "_blank");
   
-        if (chapaWindow) {
-          chapaWindow.location.href = result.data.checkout_url;
-        } else {
-          alert("Please allow pop-ups in your browser.");
-        }
-  
-        // Start verification process with the correct tx_ref
+        // Start verification process
         await verifyPayment(result.tx_ref);
       } else {
         alert(result.error || "Failed to initialize payment.");
@@ -121,9 +116,7 @@ const Cart = () => {
       console.error("Error initializing payment:", error);
       setIsProcessingPayment(false);
     }
-  };
-    
-  
+  };  
 
   // ** Verify Payment & Move Items to Orders **
   const verifyPayment = async (tx_ref) => {
