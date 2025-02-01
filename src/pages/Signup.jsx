@@ -44,9 +44,9 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#FF914D] via-[#FF6F61] to-[#FF5247] flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-br from-[#FF914D] to-yellow-500 flex items-center justify-center">
       <div className="w-full max-w-md bg-white/90 backdrop-blur-lg rounded-2xl shadow-2xl p-8 transition-transform hover:scale-105">
-        <h2 className="text-3xl font-extrabold text-center text-[#FF5247] mb-6">
+        <h2 className="text-3xl font-extrabold text-center text-[#FF914D] mb-6">
           Create Your Account
         </h2>
         <p className="text-center text-gray-600 mb-6">
@@ -126,7 +126,7 @@ const Signup = () => {
           {error && <p className="text-red-500 text-center mb-4">{error}</p>}
           <button
             type="submit"
-            className="w-full py-2 bg-[#FF5247] text-white font-semibold rounded-lg hover:bg-[#FF6F61] transition duration-300 focus:outline-none focus:ring-4 focus:ring-[#FF914D]/50"
+            className="w-full py-2 bg-[#FF914D] text-white font-semibold rounded-lg hover:bg-[#FF6F61] transition duration-300 focus:outline-none focus:ring-4 focus:ring-[#FF914D]/50"
           >
             Sign Up
           </button>
@@ -135,7 +135,7 @@ const Signup = () => {
           Already have an account?{" "}
           <span
             onClick={() => navigate("/login")}
-            className="text-[#FF6F61] cursor-pointer hover:underline"
+            className="text-[#FF914D] cursor-pointer hover:underline"
           >
             Login
           </span>
