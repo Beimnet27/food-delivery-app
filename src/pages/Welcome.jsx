@@ -2,6 +2,19 @@ import { useState } from "react";
 import Navbar from "../components/Navbar";
 import { Link } from "react-router-dom";
 import { quickEats, dailyDelights } from "../data/Menu"; // Importing food list
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+// import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+// import "leaflet/dist/leaflet.css";
+import L from "leaflet";
+
+// Custom marker icon (since Leaflet's default doesn't display properly in React)
+const customIcon = new L.Icon({
+   iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+   iconSize: [25, 41],
+   iconAnchor: [12, 41],
+   popupAnchor: [1, -34],
+ });
 
 const Welcome = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -99,6 +112,18 @@ const Welcome = () => {
             alt=""
           />
         </div>
+
+        {/* Map Section */}
+        <div className=" lg:col-span-2 xl:col-span-10 lg:mb-6 lg:mt-6">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">You Can Find Us Here</h2>
+          <MapContainer center={[9.03, 38.74]} zoom={13} className="h-[350px] w-full rounded-lg shadow-lg">
+            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+            <Marker position={[9.03, 38.74]} icon={customIcon}>
+              <Popup>Black Food - Addis Ababa</Popup>
+            </Marker>
+          </MapContainer>
+        </div>
+
       </div>
     </div>
   );
