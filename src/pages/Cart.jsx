@@ -128,42 +128,37 @@ const Cart = () => {
   
 
   // ** Verify Payment & Move Items to Orders **
-  const verifyPayment = async (tx_ref) => {
+  const verifyPayment = async (txRef) => {
     try {
-      let attempts = 0;
-      let maxAttempts = 10; // Retry checking 10 times
-      let isVerified = false;
-
-      while (attempts < maxAttempts) {
-        const response = await fetch(
-          "https://fooddelivery-backend-api.onrender.com/api/verify-payment",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ tx_ref, userId: user_id }),
-          }
-        );
-
-        const data = await response.json();
-        if (response.ok && data.success) {
-          await moveCartToOrders(); // Move cart items to orders
-          alert("Payment successful! Your order has been placed.");
-          setIsProcessingPayment(false);
-          navigate("/orders"); // Redirect to orders page
-          return;
+      const response = await fetch(
+        "https://fooddelivery-backend-api.onrender.com/api/verify-payment",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ tx_ref: txRef }),
         }
-
-        attempts++;
-        await new Promise((resolve) => setTimeout(resolve, 5000)); // Wait 5 seconds before retrying
+      );
+  
+      const result = await response.json();
+      console.log("Chapa Verification Response:", result);
+  
+      if (response.ok && result.status === "success") {
+        alert("Payment verified successfully!");
+        // Proceed with order processing
+      } else {
+        alert("Payment verification failed: " + (result.message || "Unknown error"));
       }
-
-      alert("Payment verification failed or took too long.");
-      setIsProcessingPayment(false);
     } catch (error) {
       console.error("Error verifying payment:", error);
-      setIsProcessingPayment(false);
     }
   };
+  
+  // Call verification with the correct `tx_ref`
+  const storedTxRef = localStorage.getItem("tx_ref"); // ✅ Retrieve saved tx_ref
+  if (storedTxRef) {
+    verifyPayment(storedTxRef);
+  }
+  
 
   // ** Show Loading Until Payment is Verified **
   if (isLoading || isProcessingPayment) {
