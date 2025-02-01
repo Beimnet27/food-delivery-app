@@ -77,6 +77,9 @@ const Cart = () => {
   
     setIsProcessingPayment(true);
   
+    // ✅ Generate a truly unique `tx_ref` using timestamp + random number
+    const uniqueTxRef = `tx_${Date.now()}_${Math.floor(Math.random() * 100000)}`;
+  
     const paymentData = {
       amount: totalAmount.toFixed(2),
       currency: "ETB",
@@ -84,6 +87,7 @@ const Cart = () => {
       first_name: userName.split(" ")[0] || "",
       last_name: userName.split(" ")[1] || "",
       callback_url: "https://bitegodelivery.netlify.app/payment-success",
+      tx_ref: uniqueTxRef, // ✅ Use a unique transaction reference
     };
   
     try {
@@ -97,12 +101,12 @@ const Cart = () => {
       );
   
       const result = await response.json();
-      console.log("Payment API Response:", result); // Debugging
+      console.log("Payment API Response:", result);
   
       if (response.ok && result.checkout_url) {
-        localStorage.setItem("tx_ref", result.tx_ref); // Store transaction reference
+        localStorage.setItem("tx_ref", uniqueTxRef); // ✅ Save unique tx_ref
   
-        // ✅ Open payment link directly to avoid pop-up blocking
+        // ✅ Open payment link directly to prevent pop-up blocking
         const chapaWindow = window.open(result.checkout_url, "_blank");
   
         if (!chapaWindow) {
@@ -110,7 +114,7 @@ const Cart = () => {
         }
   
         // Start verifying payment
-        await verifyPayment(result.tx_ref);
+        await verifyPayment(uniqueTxRef);
       } else {
         alert(result.error || "Failed to initialize payment.");
         setIsProcessingPayment(false);
@@ -120,6 +124,7 @@ const Cart = () => {
       setIsProcessingPayment(false);
     }
   };
+  
   
 
   // ** Verify Payment & Move Items to Orders **
