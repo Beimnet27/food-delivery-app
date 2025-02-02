@@ -189,13 +189,13 @@ const Cart = () => {
   };
   
   // ✅ Function to check payment status every 5 seconds
-  const checkPaymentStatus = async (tx_ref) => {
-    if (!tx_ref) {
-      console.error("❌ Error: tx_ref is missing!");
+  const checkPaymentStatus = async (tx_ref, userId) => {
+    if (!tx_ref || !userId) {
+      console.error("❌ Error: Missing tx_ref or userId!", { tx_ref, userId });
       return;
     }
   
-    console.log("✅ Checking payment for tx_ref:", tx_ref);
+    console.log("✅ Checking payment for:", { tx_ref, userId });
   
     const interval = setInterval(async () => {
       try {
@@ -204,7 +204,7 @@ const Cart = () => {
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ tx_ref }), // ✅ Ensure the request body format is correct
+            body: JSON.stringify({ tx_ref, userId }), // ✅ Ensure userId is included
           }
         );
   
@@ -220,7 +220,8 @@ const Cart = () => {
         console.error("❌ Error verifying payment:", error);
       }
     }, 5000);
-  };  
+  };
+  
 
   // const verifyPayment = async () => {
   //   const tx_ref = localStorage.getItem("tx_ref"); // ✅ Retrieve saved tx_ref
