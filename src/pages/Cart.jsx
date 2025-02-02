@@ -168,7 +168,7 @@ const Cart = () => {
   
       if (response.ok && result.checkout_url) {
         localStorage.setItem("tx_ref", uniqueTxRef); // ✅ Save unique tx_ref
-        window.location.href = (result.checkout_url, "_blank"); // ✅ Redirect to Chapa checkout
+        window.location.href = window.open(result.checkout_url, "_blank"); // ✅ Redirect to Chapa checkout
       } else {
         alert(result.error || "Failed to initialize payment.");
         setIsProcessingPayment(false);
