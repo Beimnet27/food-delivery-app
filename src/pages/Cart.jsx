@@ -4,7 +4,6 @@ import { doc, getDoc, setDoc, collection, addDoc } from "firebase/firestore";
 import { db } from "../firebase/firestore";
 import { useAuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom"; // Ensure navigation
-import PaymentSuccess from "./PaymentSuccess";
 
 const Cart = () => {
   const { cart, setCart, removeFromCart, updateQuantity } = useContext(CartContext);
@@ -150,7 +149,7 @@ const Cart = () => {
       email: userEmail,
       first_name: userName.split(" ")[0] || "",
       last_name: userName.split(" ")[1] || "",
-      callback_url: `https://bitegodelivery.netlify.app/payment-success?tx_ref=${uniqueTxRef}`, // ✅ Pass tx_ref in URL
+      callback_url: `https://bitegodelivery.netlify.app/PaymentSuccess?tx_ref=${uniqueTxRef}`, // ✅ Pass tx_ref in URL
       tx_ref: uniqueTxRef,
     };
   
@@ -175,7 +174,6 @@ const Cart = () => {
         if (!chapaWindow) {
           alert("Pop-up blocked! Please allow pop-ups in your browser.");
         }
-        <PaymentSuccess />
       } else {
         alert(result.error || "Failed to initialize payment.");
         setIsProcessingPayment(false);
