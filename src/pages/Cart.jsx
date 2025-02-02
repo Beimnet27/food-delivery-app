@@ -128,6 +128,43 @@ const Cart = () => {
   
 
   // ** Verify Payment & Move Items to Orders **
+  // const verifyPayment = async (tx_ref) => {
+  //   try {
+  //     let attempts = 0;
+  //     let maxAttempts = 10; // Retry checking 10 times
+  //     let isVerified = false;
+
+  //     while (attempts < maxAttempts) {
+  //       const response = await fetch(
+  //         "https://fooddelivery-backend-api.onrender.com/api/verify-payment",
+  //         {
+  //           method: "POST",
+  //           headers: { "Content-Type": "application/json" },
+  //           body: JSON.stringify({ tx_ref, userId: user_id }),
+  //         }
+  //       );
+
+  //       const data = await response.json();
+  //       if (response.ok && data.success) {
+  //         await moveCartToOrders(); // Move cart items to orders
+  //         alert("Payment successful! Your order has been placed.");
+  //         setIsProcessingPayment(false);
+  //         navigate("/orders"); // Redirect to orders page
+  //         return;
+  //       }
+
+  //       attempts++;
+  //       await new Promise((resolve) => setTimeout(resolve, 5000)); // Wait 5 seconds before retrying
+  //     }
+
+  //     alert("Payment verification failed or took too long.");
+  //     setIsProcessingPayment(false);
+  //   } catch (error) {
+  //     console.error("Error verifying payment:", error);
+  //     setIsProcessingPayment(false);
+  //   }
+  // };
+
   const verifyPayment = async (txRef) => {
     try {
       const response = await fetch(
@@ -135,7 +172,7 @@ const Cart = () => {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ tx_ref: txRef }),
+          body: JSON.stringify({ tx_ref: txRef, userId: user_id }),
         }
       );
   
@@ -158,7 +195,6 @@ const Cart = () => {
   if (storedTxRef) {
     verifyPayment(storedTxRef);
   }
-  
 
   // ** Show Loading Until Payment is Verified **
   if (isLoading || isProcessingPayment) {
