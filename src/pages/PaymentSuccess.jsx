@@ -3,47 +3,49 @@ import { useSearchParams } from "react-router-dom";
 import { useAuthContext } from "../context/AuthContext";
 
 const PaymentSuccess = () => {
-  const [searchParams] = useSearchParams();
-  const tx_ref = searchParams.get("tx_ref");
-  const { user_id } = useAuthContext();
-  
-  useEffect(() => {
-    if (tx_ref) {
-      verifyPayment(tx_ref);
-    }
-  }, [tx_ref]);
+    const [searchParams] = useSearchParams();
+    const { user_id } = useAuthContext();
 
-  const verifyPayment = async (tx_ref) => {
-    try {
-      const response = await fetch(
-        "https://fooddelivery-backend-api.onrender.com/api/verify-payment",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ tx_ref, user_id }), // Send tx_ref & user ID
+    // ✅ Get Chapa's `tx_ref` from URL or localStorage
+    const tx_ref = searchParams.get("tx_ref") || localStorage.getItem("tx_ref");
+
+    useEffect(() => {
+        if (tx_ref) {
+            verifyPayment(tx_ref);
         }
-      );
+    }, [tx_ref]);
 
-      const verificationData = await response.json();
-      console.log("✅ Payment Verification Response:", verificationData);
+    const verifyPayment = async (tx_ref) => {
+        try {
+            const response = await fetch(
+                "https://fooddelivery-backend-api.onrender.com/api/verify-payment",
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ tx_ref, user_id }),
+                }
+            );
 
-      if (verificationData.success) {
-        alert("🎉 Payment successful! Your order has been placed.");
-        localStorage.removeItem("tx_ref"); // ✅ Clear saved tx_ref
-      } else {
-        alert("⚠️ Payment verification failed: " + verificationData.error);
-      }
-    } catch (error) {
-      console.error("❌ Payment verification error:", error);
-      alert("⚠️ Payment verification error.");
-    }
-  };
+            const verificationData = await response.json();
+            console.log("✅ Payment Verification Response:", verificationData);
 
-  return (
-    <div>
-      <h2>Verifying Payment...</h2>
-    </div>
-  );
+            if (verificationData.success) {
+                alert("🎉 Payment successful! Your order has been placed.");
+                localStorage.removeItem("tx_ref"); // ✅ Clear tx_ref after successful verification
+            } else {
+                alert("⚠️ Payment verification failed: " + verificationData.error);
+            }
+        } catch (error) {
+            console.error("❌ Payment verification error:", error);
+            alert("⚠️ Payment verification error.");
+        }
+    };
+
+    return (
+        <div>
+            <h2>Verifying Payment...</h2>
+        </div>
+    );
 };
 
 export default PaymentSuccess;

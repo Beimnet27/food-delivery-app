@@ -127,66 +127,63 @@ const Cart = () => {
 
   const handleCheckout = async () => {
     const totalAmount = calculateTotal();
-  
+
     if (totalAmount <= 0) {
-      alert("Your cart is empty!");
-      return;
+        alert("Your cart is empty!");
+        return;
     }
-  
+
     if (!userEmail || !userName) {
-      alert("Please provide user details.");
-      return;
+        alert("Please provide user details.");
+        return;
     }
-  
+
     setIsProcessingPayment(true);
-  
-    // ✅ Generate a truly unique `tx_ref`
-    const uniqueTxRef = `tx_${Date.now()}_${Math.floor(Math.random() * 100000)}`;
-  
+
     const paymentData = {
-      amount: totalAmount.toFixed(2),
-      currency: "ETB",
-      email: userEmail,
-      first_name: userName.split(" ")[0] || "",
-      last_name: userName.split(" ")[1] || "",
-      callback_url: `https://bitegodelivery.netlify.app/PaymentSuccess?tx_ref=${uniqueTxRef}`, // ✅ Pass tx_ref in URL
-      tx_ref: uniqueTxRef,
+        amount: totalAmount.toFixed(2),
+        currency: "ETB",
+        email: userEmail,
+        first_name: userName.split(" ")[0] || "",
+        last_name: userName.split(" ")[1] || "",
+        callback_url: "https://bitegodelivery.netlify.app/PaymentSuccess", // ✅ No tx_ref in URL
     };
-  
+
     try {
-      const response = await fetch(
-        "https://fooddelivery-backend-api.onrender.com/api/initialize-payment",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(paymentData),
+        const response = await fetch(
+            "https://fooddelivery-backend-api.onrender.com/api/initialize-payment",
+            {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(paymentData),
+            }
+        );
+
+        const result = await response.json();
+        console.log("Payment API Response:", result);
+
+        if (response.ok && result.checkout_url && result.tx_ref) {
+            localStorage.setItem("tx_ref", result.tx_ref); // ✅ Store Chapa's tx_ref
+
+            // ✅ Open Chapa checkout page
+            const chapaWindow = window.open(result.checkout_url, "_blank");
+
+            if (!chapaWindow) {
+                alert("Pop-up blocked! Please allow pop-ups in your browser.");
+            }
+
+            // ✅ Start checking for payment verification
+            checkPaymentStatus(result.tx_ref, user_id);
+        } else {
+            alert(result.error || "Failed to initialize payment.");
+            setIsProcessingPayment(false);
         }
-      );
-  
-      const result = await response.json();
-      console.log("Payment API Response:", result);
-  
-      if (response.ok && result.checkout_url) {
-        localStorage.setItem("tx_ref", uniqueTxRef); // ✅ Save unique tx_ref
-  
-        // ✅ Open Chapa checkout page
-        const chapaWindow = window.open(result.checkout_url, "_blank");
-  
-        if (!chapaWindow) {
-          alert("Pop-up blocked! Please allow pop-ups in your browser.");
-        }
-  
-        // ✅ Start checking for payment verification
-        checkPaymentStatus(uniqueTxRef, user_id);
-      } else {
-        alert(result.error || "Failed to initialize payment.");
-        setIsProcessingPayment(false);
-      }
     } catch (error) {
-      console.error("Error initializing payment:", error);
-      setIsProcessingPayment(false);
+        console.error("Error initializing payment:", error);
+        setIsProcessingPayment(false);
     }
-  };
+};
+
   
   // ✅ Function to check payment status every 5 seconds
   const checkPaymentStatus = async (tx_ref, user_id) => {
