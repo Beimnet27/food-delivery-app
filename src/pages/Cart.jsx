@@ -213,10 +213,10 @@ const Cart = () => {
   
   
   // Call verification with the correct `tx_ref`
-  const storedTxRef = localStorage.getItem("tx_ref"); // ✅ Retrieve saved tx_ref
-  if (storedTxRef) {
-    verifyPayment(storedTxRef);
-  }
+  // const storedTxRef = localStorage.getItem("tx_ref"); // ✅ Retrieve saved tx_ref
+  // if (storedTxRef) {
+  //   verifyPayment(storedTxRef);
+  // }
 
   // ** Show Loading Until Payment is Verified **
   if (isLoading || isProcessingPayment) {
