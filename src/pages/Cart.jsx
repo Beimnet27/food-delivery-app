@@ -197,7 +197,7 @@ const Cart = () => {
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ tx_ref, userId }), // ✅ Pass tx_ref for verification
+            body: JSON.stringify({ tx_ref, user_id }), // ✅ Pass tx_ref for verification
           }
         );
   
