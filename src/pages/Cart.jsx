@@ -165,7 +165,21 @@ const Cart = () => {
   
       const result = await response.json();
       console.log("Payment API Response:", result);
-  
+      fetch("https://your-backend.com/api/verify-payment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tx_ref, userId }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            window.location.href = "/PaymentSuccess";
+          } else {
+            alert("Payment verification failed!");
+          }
+        })
+        .catch((error) => console.error("Error verifying payment:", error));
+      
       if (response.ok && result.checkout_url) {
         localStorage.setItem("tx_ref", uniqueTxRef); // ✅ Save unique tx_ref
 
