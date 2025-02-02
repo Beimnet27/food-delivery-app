@@ -62,6 +62,69 @@ const Cart = () => {
   };
 
   // Handle Checkout with Chapa
+  // const handleCheckout = async () => {
+  //   const totalAmount = calculateTotal();
+  
+  //   if (totalAmount <= 0) {
+  //     alert("Your cart is empty!");
+  //     return;
+  //   }
+  
+  //   if (!userEmail || !userName) {
+  //     alert("Please provide user details.");
+  //     return;
+  //   }
+  
+  //   setIsProcessingPayment(true);
+  
+  //   // ✅ Generate a truly unique `tx_ref` using timestamp + random number
+  //   const uniqueTxRef = `tx_${Date.now()}_${Math.floor(Math.random() * 100000)}`;
+  
+  //   const paymentData = {
+  //     amount: totalAmount.toFixed(2),
+  //     currency: "ETB",
+  //     email: userEmail,
+  //     first_name: userName.split(" ")[0] || "",
+  //     last_name: userName.split(" ")[1] || "",
+  //     callback_url: "https://bitegodelivery.netlify.app/payment-success",
+  //     tx_ref: uniqueTxRef, // ✅ Use a unique transaction reference
+  //   };
+  
+  //   try {
+  //     const response = await fetch(
+  //       "https://fooddelivery-backend-api.onrender.com/api/initialize-payment",
+  //       {
+  //         method: "POST",
+  //         headers: { "Content-Type": "application/json" },
+  //         body: JSON.stringify(paymentData),
+  //       }
+  //     );
+  
+  //     const result = await response.json();
+  //     console.log("Payment API Response:", result);
+  
+  //     if (response.ok && result.checkout_url) {
+  //       localStorage.setItem("tx_ref", uniqueTxRef); // ✅ Save unique tx_ref
+  
+  //       // ✅ Open payment link directly to prevent pop-up blocking
+  //       const chapaWindow = window.open(result.checkout_url, "_blank");
+  
+  //       if (!chapaWindow) {
+  //         alert("Pop-up blocked! Please allow pop-ups in your browser.");
+  //       }
+  
+  //       // Start verifying payment
+  //       await verifyPayment(uniqueTxRef);
+  //     } else {
+  //       alert(result.error || "Failed to initialize payment.");
+  //       setIsProcessingPayment(false);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error initializing payment:", error);
+  //     setIsProcessingPayment(false);
+  //   }
+  // };
+
   const handleCheckout = async () => {
     const totalAmount = calculateTotal();
   
@@ -77,7 +140,7 @@ const Cart = () => {
   
     setIsProcessingPayment(true);
   
-    // ✅ Generate a truly unique `tx_ref` using timestamp + random number
+    // ✅ Generate a truly unique `tx_ref`
     const uniqueTxRef = `tx_${Date.now()}_${Math.floor(Math.random() * 100000)}`;
   
     const paymentData = {
@@ -86,8 +149,8 @@ const Cart = () => {
       email: userEmail,
       first_name: userName.split(" ")[0] || "",
       last_name: userName.split(" ")[1] || "",
-      callback_url: "https://bitegodelivery.netlify.app/payment-success",
-      tx_ref: uniqueTxRef, // ✅ Use a unique transaction reference
+      callback_url: `https://bitegodelivery.netlify.app/payment-success?tx_ref=${uniqueTxRef}`, // ✅ Pass tx_ref in URL
+      tx_ref: uniqueTxRef,
     };
   
     try {
@@ -105,16 +168,7 @@ const Cart = () => {
   
       if (response.ok && result.checkout_url) {
         localStorage.setItem("tx_ref", uniqueTxRef); // ✅ Save unique tx_ref
-  
-        // ✅ Open payment link directly to prevent pop-up blocking
-        const chapaWindow = window.open(result.checkout_url, "_blank");
-  
-        if (!chapaWindow) {
-          alert("Pop-up blocked! Please allow pop-ups in your browser.");
-        }
-  
-        // Start verifying payment
-        await verifyPayment(uniqueTxRef);
+        window.location.href = (result.checkout_url, "_blank"); // ✅ Redirect to Chapa checkout
       } else {
         alert(result.error || "Failed to initialize payment.");
         setIsProcessingPayment(false);
@@ -125,70 +179,38 @@ const Cart = () => {
     }
   };
   
+
+
+  // const verifyPayment = async () => {
+  //   const tx_ref = localStorage.getItem("tx_ref"); // ✅ Retrieve saved tx_ref
+  //   if (!tx_ref) {
+  //     console.error("❌ No tx_ref found. Payment verification skipped.");
+  //     return;
+  //   }
   
-
-  // ** Verify Payment & Move Items to Orders **
-  // const verifyPayment = async (tx_ref) => {
   //   try {
-  //     let attempts = 0;
-  //     let maxAttempts = 10; // Retry checking 10 times
-  //     let isVerified = false;
-
-  //     while (attempts < maxAttempts) {
-  //       const response = await fetch(
-  //         "https://fooddelivery-backend-api.onrender.com/api/verify-payment",
-  //         {
-  //           method: "POST",
-  //           headers: { "Content-Type": "application/json" },
-  //           body: JSON.stringify({ tx_ref, userId: user_id }),
-  //         }
-  //       );
-
-  //       const data = await response.json();
-  //       if (response.ok && data.success) {
-  //         await moveCartToOrders(); // Move cart items to orders
-  //         alert("Payment successful! Your order has been placed.");
-  //         setIsProcessingPayment(false);
-  //         navigate("/orders"); // Redirect to orders page
-  //         return;
-  //       }
-
-  //       attempts++;
-  //       await new Promise((resolve) => setTimeout(resolve, 5000)); // Wait 5 seconds before retrying
+  //     const response = await fetch("https://fooddelivery-backend-api.onrender.com/api/verify-payment", {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({ tx_ref, userId }),
+  //     });
+  
+  //     const verificationData = await response.json();
+  //     console.log("✅ Chapa Verification Response:", verificationData);
+  
+  //     if (verificationData.success) {
+  //       alert("🎉 Payment verified successfully!");
+  //       localStorage.removeItem("tx_ref"); // ✅ Clear stored tx_ref after success
+  //     } else {
+  //       console.error("❌ Payment verification failed:", verificationData.error);
+  //       alert("⚠️ Payment verification failed: " + verificationData.error);
   //     }
-
-  //     alert("Payment verification failed or took too long.");
-  //     setIsProcessingPayment(false);
   //   } catch (error) {
-  //     console.error("Error verifying payment:", error);
-  //     setIsProcessingPayment(false);
+  //     console.error("❌ Verification error:", error);
+  //     alert("⚠️ Payment verification error.");
   //   }
   // };
-
-  const verifyPayment = async (txRef) => {
-    try {
-      const response = await fetch(
-        "https://fooddelivery-backend-api.onrender.com/api/verify-payment",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ tx_ref: txRef, userId: user_id }),
-        }
-      );
   
-      const result = await response.json();
-      console.log("Chapa Verification Response:", result);
-  
-      if (response.ok && result.status === "success") {
-        alert("Payment verified successfully!");
-        // Proceed with order processing
-      } else {
-        alert("Payment verification failed: " + (result.message || "Unknown error"));
-      }
-    } catch (error) {
-      console.error("Error verifying payment:", error);
-    }
-  };
   
   // Call verification with the correct `tx_ref`
   const storedTxRef = localStorage.getItem("tx_ref"); // ✅ Retrieve saved tx_ref
@@ -198,7 +220,7 @@ const Cart = () => {
 
   // ** Show Loading Until Payment is Verified **
   if (isLoading || isProcessingPayment) {
-    return <p className="text-white text-center">Processing payment... Please wait.</p>;
+    return <p className="text-black text-center">Processing payment... Please wait.</p>;
   }
 
   return (

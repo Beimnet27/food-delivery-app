@@ -1,36 +1,45 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuthContext } from "../context/AuthContext";
 
 const PaymentSuccess = () => {
-  const navigate = useNavigate();
-  const { moveCartToOrders, user_id } = useAuthContext();
-
   useEffect(() => {
-    const verifyPayment = async () => {
-      const tx_ref = localStorage.getItem("tx_ref");
-      if (!tx_ref) return;
+    const urlParams = new URLSearchParams(window.location.search);
+    const tx_ref = urlParams.get("tx_ref");
 
-      const response = await fetch("/api/verify-payment", {
+    if (tx_ref) {
+      verifyPayment(tx_ref);
+    }
+  }, []);
+
+  const verifyPayment = async (tx_ref) => {
+    try {
+      const response = await fetch("https://fooddelivery-backend-api.onrender.com/api/verify-payment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tx_ref, userId: user_id }),
+        body: JSON.stringify({ tx_ref, userId }), // ✅ Include userId
       });
 
-      const data = await response.json();
-      if (response.ok) {
-        alert("Payment successful!");
-        moveCartToOrders(); // Move cart items to orders
-        navigate("/"); // Redirect home
+      const verificationData = await response.json();
+      console.log("✅ Chapa Verification Response:", verificationData);
+
+      if (verificationData.success) {
+        alert("🎉 Payment verified successfully!");
+        localStorage.removeItem("tx_ref"); // ✅ Clear stored tx_ref
       } else {
-        alert("Payment verification failed.");
+        console.error("❌ Payment verification failed:", verificationData.error);
+        alert("⚠️ Payment verification failed: " + verificationData.error);
       }
-    };
+    } catch (error) {
+      console.error("❌ Verification error:", error);
+      alert("⚠️ Payment verification error.");
+    }
+  };
 
-    verifyPayment();
-  }, [navigate, moveCartToOrders, user_id]);
-
-  return <p>Verifying payment...</p>;
+  return (
+    <div>
+      <h2>Payment Success</h2>
+      <p>Your payment is being verified...</p>
+    </div>
+  );
 };
 
 export default PaymentSuccess;
