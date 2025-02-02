@@ -173,7 +173,7 @@ const Cart = () => {
         .then((res) => res.json())
         .then((data) => {
           if (data.success) {
-            window.location.href = "/PaymentSuccess";
+            window.location.href = "/PaymentSuccess?tx_ref=${uniqueTxRef}";
           } else {
             alert("Payment verification failed!");
           }
