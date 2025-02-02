@@ -165,29 +165,19 @@ const Cart = () => {
   
       const result = await response.json();
       console.log("Payment API Response:", result);
-      fetch("https://your-backend.com/api/verify-payment", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tx_ref, userId }),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.success) {
-            window.location.href = "/PaymentSuccess?tx_ref=${uniqueTxRef}";
-          } else {
-            alert("Payment verification failed!");
-          }
-        })
-        .catch((error) => console.error("Error verifying payment:", error));
-      
+  
       if (response.ok && result.checkout_url) {
         localStorage.setItem("tx_ref", uniqueTxRef); // ✅ Save unique tx_ref
-
+  
+        // ✅ Open Chapa checkout page
         const chapaWindow = window.open(result.checkout_url, "_blank");
   
         if (!chapaWindow) {
           alert("Pop-up blocked! Please allow pop-ups in your browser.");
         }
+  
+        // ✅ Start checking for payment verification
+        checkPaymentStatus(uniqueTxRef);
       } else {
         alert(result.error || "Failed to initialize payment.");
         setIsProcessingPayment(false);
@@ -196,6 +186,34 @@ const Cart = () => {
       console.error("Error initializing payment:", error);
       setIsProcessingPayment(false);
     }
+  };
+  
+  // ✅ Function to check payment status every 5 seconds
+  const checkPaymentStatus = async (tx_ref) => {
+    const interval = setInterval(async () => {
+      try {
+        const response = await fetch(
+          "https://fooddelivery-backend-api.onrender.com/api/verify-payment",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ tx_ref, userId }), // ✅ Pass tx_ref for verification
+          }
+        );
+  
+        const result = await response.json();
+        console.log("Payment Verification Response:", result);
+  
+        if (result.success) {
+          clearInterval(interval); // ✅ Stop checking once verified
+          localStorage.removeItem("tx_ref");
+  
+          window.location.href = `/PaymentSuccess?tx_ref=${tx_ref}`; // ✅ Redirect to success page
+        }
+      } catch (error) {
+        console.error("Error verifying payment:", error);
+      }
+    }, 5000); // ✅ Check every 5 seconds
   };
   
 
