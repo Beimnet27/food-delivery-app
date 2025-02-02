@@ -191,38 +191,36 @@ const Cart = () => {
   // ✅ Function to check payment status every 5 seconds
   const checkPaymentStatus = async (tx_ref) => {
     if (!tx_ref) {
-      console.error("Error: tx_ref is missing!");
+      console.error("❌ Error: tx_ref is missing!");
       return;
     }
   
+    console.log("✅ Checking payment for tx_ref:", tx_ref);
+  
     const interval = setInterval(async () => {
       try {
-        console.log("Checking payment for tx_ref:", tx_ref);
-  
         const response = await fetch(
           "https://fooddelivery-backend-api.onrender.com/api/verify-payment",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ tx_ref }), // ✅ Ensure correct format
+            body: JSON.stringify({ tx_ref }), // ✅ Ensure the request body format is correct
           }
         );
   
         const result = await response.json();
-        console.log("Payment Verification Response:", result);
+        console.log("🔍 Payment Verification Response:", result);
   
         if (response.ok && result.success) {
-          clearInterval(interval); // ✅ Stop checking once verified
+          clearInterval(interval);
           localStorage.removeItem("tx_ref");
-  
-          window.location.href = `/PaymentSuccess?tx_ref=${tx_ref}`; // ✅ Redirect to success page
+          window.location.href = `/PaymentSuccess?tx_ref=${tx_ref}`;
         }
       } catch (error) {
-        console.error("Error verifying payment:", error);
+        console.error("❌ Error verifying payment:", error);
       }
-    }, 5000); // ✅ Check every 5 seconds
+    }, 5000);
   };  
-
 
   // const verifyPayment = async () => {
   //   const tx_ref = localStorage.getItem("tx_ref"); // ✅ Retrieve saved tx_ref
