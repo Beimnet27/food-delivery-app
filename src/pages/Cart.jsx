@@ -189,13 +189,13 @@ const Cart = () => {
   };
   
   // ✅ Function to check payment status every 5 seconds
-  const checkPaymentStatus = async (tx_ref, userId) => {
-    if (!tx_ref || !userId) {
-      console.error("❌ Error: Missing tx_ref or userId!", { tx_ref, userId });
+  const checkPaymentStatus = async (tx_ref, user_id) => {
+    if (!tx_ref || !user_id) {
+      console.error("❌ Error: Missing tx_ref or user_id!", { tx_ref, user_id });
       return;
     }
   
-    console.log("✅ Checking payment for:", { tx_ref, userId });
+    console.log("✅ Checking payment for:", { tx_ref, user_id });
   
     const interval = setInterval(async () => {
       try {
@@ -204,7 +204,7 @@ const Cart = () => {
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ tx_ref, userId }), // ✅ Ensure userId is included
+            body: JSON.stringify({ tx_ref, user_id }), // ✅ Ensure user_id is included
           }
         );
   
@@ -234,7 +234,7 @@ const Cart = () => {
   //     const response = await fetch("https://fooddelivery-backend-api.onrender.com/api/verify-payment", {
   //       method: "POST",
   //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({ tx_ref, userId }),
+  //       body: JSON.stringify({ tx_ref, user_id }),
   //     });
   
   //     const verificationData = await response.json();
