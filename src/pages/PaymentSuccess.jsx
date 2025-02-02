@@ -1,10 +1,12 @@
 import { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
+import { useAuthContext } from "../context/AuthContext";
 
 const PaymentSuccess = () => {
   const [searchParams] = useSearchParams();
   const tx_ref = searchParams.get("tx_ref");
-
+  const { user_id } = useAuthContext();
+  
   useEffect(() => {
     if (tx_ref) {
       verifyPayment(tx_ref);
@@ -18,7 +20,7 @@ const PaymentSuccess = () => {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ tx_ref, userId }), // Send tx_ref & user ID
+          body: JSON.stringify({ tx_ref, user_id }), // Send tx_ref & user ID
         }
       );
 
