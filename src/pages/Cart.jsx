@@ -177,7 +177,7 @@ const Cart = () => {
         }
   
         // ✅ Start checking for payment verification
-        checkPaymentStatus(uniqueTxRef);
+        checkPaymentStatus(uniqueTxRef, user_id);
       } else {
         alert(result.error || "Failed to initialize payment.");
         setIsProcessingPayment(false);
