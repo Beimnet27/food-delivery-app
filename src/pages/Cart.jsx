@@ -4,7 +4,7 @@ import { doc, getDoc, setDoc, collection, addDoc } from "firebase/firestore";
 import { db } from "../firebase/firestore";
 import { useAuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom"; // Ensure navigation
-import { PaymentSuccess } from "./PaymentSuccess";
+import PaymentSuccess from "./PaymentSuccess";
 
 const Cart = () => {
   const { cart, setCart, removeFromCart, updateQuantity } = useContext(CartContext);
