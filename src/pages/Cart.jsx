@@ -4,6 +4,7 @@ import { doc, getDoc, setDoc, collection, addDoc } from "firebase/firestore";
 import { db } from "../firebase/firestore";
 import { useAuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom"; // Ensure navigation
+import { PaymentSuccess } from "./PaymentSuccess";
 
 const Cart = () => {
   const { cart, setCart, removeFromCart, updateQuantity } = useContext(CartContext);
@@ -174,6 +175,7 @@ const Cart = () => {
         if (!chapaWindow) {
           alert("Pop-up blocked! Please allow pop-ups in your browser.");
         }
+        <PaymentSuccess />
       } else {
         alert(result.error || "Failed to initialize payment.");
         setIsProcessingPayment(false);
