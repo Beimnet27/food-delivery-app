@@ -38,30 +38,37 @@ const DeliveryManagement = () => {
   };
 
   // Add Delivery Person
-  const handleAddDeliveryPerson = async () => {
-    const { email, name, phone, address, password } = formData;
+const handleAddDeliveryPerson = async () => {
+  const { email, name, phone, address, password } = formData;
 
-    if (!email || !name || !phone || !address || !password) {
-      alert("Please fill out all fields!");
-      return;
-    }
+  if (!email || !name || !phone || !address || !password) {
+    alert("Please fill out all fields!");
+    return;
+  }
 
-    try {
-      await addDoc(collection(db, "deliveryPerson"), {
-        email,
-        name,
-        phone,
-        address,
-        password,
-        createdAt: serverTimestamp(),
-      });
-      alert("Delivery person added successfully!");
-      setFormData({ email: "", name: "", phone: "", address: "", password: "" });
-      fetchDeliveryPersons();
-    } catch (error) {
-      console.error("Error adding delivery person:", error);
-    }
-  };
+  try {
+    // Step 1: Add document without an ID
+    const docRef = await addDoc(collection(db, "deliveryPerson"), {
+      email,
+      name,
+      phone,
+      address,
+      password,
+      createdAt: serverTimestamp(),
+    });
+
+    // Step 2: Update the same document to include the auto-generated ID
+    await updateDoc(doc(db, "deliveryPerson", docRef.id), {
+      id: docRef.id,
+    });
+
+    alert("Delivery person added successfully!");
+    setFormData({ email: "", name: "", phone: "", address: "", password: "" });
+    fetchDeliveryPersons(); // Refresh the list
+  } catch (error) {
+    console.error("Error adding delivery person:", error);
+  }
+};
 
   // Edit Delivery Person Password
   const handleEditPassword = async (id, newPassword) => {

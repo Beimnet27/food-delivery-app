@@ -1,16 +1,24 @@
 import { useEffect, useState } from "react";
 import { db } from "../firebase/firestore"; // Import Firestore
-import { collection, getDocs, doc, getDoc, query, where, onSnapshot } from "firebase/firestore";
+import { collection, updateDoc, doc, getDoc, query, where, onSnapshot } from "firebase/firestore";
+import { useLocation } from "react-router-dom";
 
-const DeliveryPersonHome = ({ userId }) => {
+const DeliveryPersonHome = () => {
+  const location = useLocation();
+  const userId = location.state?.userId || ""; // Retrieve userId from navigation state
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deliveryPerson, setDeliveryPerson] = useState(null);
 
   useEffect(() => {
+    if (!userId) {
+      console.warn("User ID not found. Redirecting to login...");
+      return;
+    }
+
     const fetchDeliveryPerson = async () => {
       try {
-        const deliveryRef = doc(db, "deliveryPerson", id);
+        const deliveryRef = doc(db, "deliveryPerson", userId);
         const deliverySnap = await getDoc(deliveryRef);
 
         if (deliverySnap.exists()) {
@@ -23,7 +31,7 @@ const DeliveryPersonHome = ({ userId }) => {
       }
     };
 
-    if (userId) fetchDeliveryPerson();
+    fetchDeliveryPerson();
   }, [userId]);
 
   useEffect(() => {
@@ -103,7 +111,7 @@ const DeliveryPersonHome = ({ userId }) => {
                   className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
                   onClick={() => handleAcceptOrder(order.id)}
                 >
-                  Simple
+                  Take The Order
                 </button>
               ) : (
                 <span className="text-sm font-medium text-red-500">In Delivery</span>

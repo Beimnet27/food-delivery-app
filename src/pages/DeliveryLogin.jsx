@@ -14,7 +14,7 @@ const DeliveryLogin = () => {
     setError("");
 
     try {
-      // Query the deliveryPerson collection for matching email and password
+      // Query the deliveryPerson collection for a matching email and password
       const deliveryPersonRef = collection(db, "deliveryPerson");
       const q = query(
         deliveryPersonRef,
@@ -24,13 +24,16 @@ const DeliveryLogin = () => {
 
       const querySnapshot = await getDocs(q);
 
-      // Check if there is exactly one match
+      // Check if a single matching document is found
       if (querySnapshot.size === 1) {
-        const user = querySnapshot.docs[0].data();
-        console.log("Login successful:", user);
+        const userDoc = querySnapshot.docs[0];
+        const userData = userDoc.data();
+        const userId = userDoc.id; // Firestore-generated ID
 
-        // Redirect to the delivery dashboard or appropriate page
-        navigate("/deliveryHome"); // Replace with your dashboard route
+        //console.log("Login successful:", userData);
+
+        // Redirect to Delivery Home and pass the userId
+        navigate("/deliveryHome", { state: { userId } });
       } else {
         setError("Invalid email or password. Please try again.");
       }
