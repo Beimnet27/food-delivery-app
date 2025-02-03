@@ -8,7 +8,7 @@ const OrderManagement = () => {
 
   const fetchOrders = async () => {
     try {
-      const querySnapshot = await getDocs(collection(db, "Orders"));
+      const querySnapshot = await getDocs(collection(db, "orders"));
       const orderData = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
