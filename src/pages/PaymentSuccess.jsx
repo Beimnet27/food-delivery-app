@@ -4,7 +4,7 @@ import { useAuthContext } from "../context/AuthContext";
 
 const PaymentSuccess = () => {
     const [searchParams] = useSearchParams();
-    const { user_id } = useAuthContext();
+    const { user_id, phone_number } = useAuthContext();
 
     // ✅ Get Chapa's `tx_ref` from URL or localStorage
     const tx_ref = searchParams.get("tx_ref") || localStorage.getItem("tx_ref");
@@ -24,7 +24,7 @@ const PaymentSuccess = () => {
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ tx_ref, user_id, customerLat, customerLng }),
+                    body: JSON.stringify({ tx_ref, user_id, phone_number, customerLat, customerLng }),
                 }
             );
 
