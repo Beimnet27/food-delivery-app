@@ -171,10 +171,8 @@ const proceedWithPayment = async (latitude, longitude, totalAmount) => {
         currency: "ETB",
         email: userEmail,
         first_name: userName.split(" ")[0] || "",
-        phone_number: phoneNumber,
         last_name: userName.split(" ")[1] || "",
-        customerLat: latitude,  
-        customerLng: longitude,
+        phone_number: phoneNumber,
         callback_url: "https://bitegodelivery.netlify.app/PaymentSuccess",
     };
 
@@ -193,6 +191,8 @@ const proceedWithPayment = async (latitude, longitude, totalAmount) => {
 
         if (response.ok && result.checkout_url && result.tx_ref) {
             localStorage.setItem("tx_ref", result.tx_ref); 
+            localStorage.setItem("longitude", longitude);
+            localStorage.setItem("latitude", latitude);
 
             const chapaWindow = window.open(result.checkout_url, "_blank");
 

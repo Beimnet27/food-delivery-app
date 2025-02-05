@@ -8,6 +8,8 @@ const PaymentSuccess = () => {
 
     // ✅ Get Chapa's `tx_ref` from URL or localStorage
     const tx_ref = searchParams.get("tx_ref") || localStorage.getItem("tx_ref");
+    const customerLat = localStorage.getItem("customerLat");
+    const customerLng = localStorage.getItem("customerLng");
 
     useEffect(() => {
         if (tx_ref) {
@@ -22,7 +24,7 @@ const PaymentSuccess = () => {
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ tx_ref, user_id }),
+                    body: JSON.stringify({ tx_ref, user_id, customerLat, customerLng }),
                 }
             );
 
