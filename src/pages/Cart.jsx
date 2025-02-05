@@ -165,7 +165,7 @@ const Cart = () => {
     );
 };
 
-const proceedWithPayment = async (latitude, longitude, totalAmount) => {
+const proceedWithPayment = async (totalAmount) => {
     const paymentData = {
         amount: totalAmount.toFixed(2),
         currency: "ETB",
