@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom"; // Ensure navigation
 
 const Cart = () => {
   const { cart, setCart, removeFromCart, updateQuantity } = useContext(CartContext);
-  const { user_id, userEmail, userName, phoneNumber } = useAuthContext();
+  const { user_id, userEmail, userName } = useAuthContext();
   const [isLoading, setIsLoading] = useState(true);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const navigate = useNavigate();
@@ -172,7 +172,6 @@ const proceedWithPayment = async (totalAmount) => {
         email: userEmail,
         first_name: userName.split(" ")[0] || "",
         last_name: userName.split(" ")[1] || "",
-        phone_number: phoneNumber,
         callback_url: "https://bitegodelivery.netlify.app/PaymentSuccess",
     };
 
