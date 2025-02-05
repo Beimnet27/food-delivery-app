@@ -153,6 +153,8 @@ const Cart = () => {
 
             // Debugging Step
             alert(`Location fetched: Latitude: ${latitude}, Longitude: ${longitude}`);
+            localStorage.setItem("customerLat", longitude);
+            localStorage.setItem("customerLng", latitude);
 
             // ✅ Now proceed with payment after getting the location
             await proceedWithPayment(latitude, longitude, totalAmount);
@@ -190,8 +192,6 @@ const proceedWithPayment = async (totalAmount) => {
 
         if (response.ok && result.checkout_url && result.tx_ref) {
             localStorage.setItem("tx_ref", result.tx_ref); 
-            localStorage.setItem("longitude", longitude);
-            localStorage.setItem("latitude", latitude);
 
             const chapaWindow = window.open(result.checkout_url, "_blank");
 
