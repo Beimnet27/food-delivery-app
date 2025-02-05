@@ -138,32 +138,32 @@ const Cart = () => {
         return;
     }
 
-    // Request user location
     if (!navigator.geolocation) {
         alert("Geolocation is not supported by your browser.");
+        console.error("❌ Geolocation is not supported.");
         return;
     }
 
     setIsProcessingPayment(true);
+    console.log("📍 Requesting user location...");
 
     navigator.geolocation.getCurrentPosition(
         async (position) => {
+            console.log("✅ Location received:", position); // Debugging
+
             const { latitude, longitude } = position.coords;
-            console.log("✅ User Location:", latitude, longitude);
+            alert(`Location fetched! Latitude: ${latitude}, Longitude: ${longitude}`);
 
-            // Debugging Step
-            alert(`Location fetched: Latitude: ${latitude}, Longitude: ${longitude}`);
-            localStorage.setItem("customerLat", longitude);
-            localStorage.setItem("customerLng", latitude);
+            console.log("✅ Latitude:", latitude, "Longitude:", longitude);
 
-            // ✅ Now proceed with payment after getting the location
             await proceedWithPayment(latitude, longitude, totalAmount);
         },
         (error) => {
             console.error("❌ Error getting location:", error);
-            alert("Failed to get your location. Please enable location services and try again.");
+            alert(`Failed to get location: ${error.message}`);
             setIsProcessingPayment(false);
-        }
+        },
+        { timeout: 10000, enableHighAccuracy: true } // Increase timeout & request high accuracy
     );
 };
 
@@ -177,6 +177,8 @@ const proceedWithPayment = async (totalAmount) => {
         callback_url: "https://bitegodelivery.netlify.app/PaymentSuccess",
     };
 
+    console.log("📤 Sending payment data:", paymentData);
+
     try {
         const response = await fetch(
             "https://fooddelivery-backend-api.onrender.com/api/initialize-payment",
@@ -188,17 +190,19 @@ const proceedWithPayment = async (totalAmount) => {
         );
 
         const result = await response.json();
-        console.log("✅ Payment API Response:", result);
+        console.log("💳 Payment API Response:", result);
 
         if (response.ok && result.checkout_url && result.tx_ref) {
-            localStorage.setItem("tx_ref", result.tx_ref); 
+            localStorage.setItem("tx_ref", result.tx_ref); // ✅ Store transaction reference
 
+            // ✅ Open checkout page
             const chapaWindow = window.open(result.checkout_url, "_blank");
 
             if (!chapaWindow) {
                 alert("Pop-up blocked! Please allow pop-ups in your browser.");
             }
 
+            // ✅ Start checking payment status
             checkPaymentStatus(result.tx_ref, user_id);
         } else {
             alert(result.error || "Failed to initialize payment.");
@@ -209,6 +213,7 @@ const proceedWithPayment = async (totalAmount) => {
         setIsProcessingPayment(false);
     }
 };
+
 
 
   
