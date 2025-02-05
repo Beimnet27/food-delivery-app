@@ -200,7 +200,8 @@ const proceedWithPayment = async (latitude, longitude, totalAmount) => {
                 alert("Pop-up blocked! Please allow pop-ups in your browser.");
             }
 
-            checkPaymentStatus(result.tx_ref, user_id);
+            checkPaymentStatus(result.tx_ref, user_id, latitude, longitude);
+
         } else {
             alert(result.error || "Failed to initialize payment.");
             setIsProcessingPayment(false);
@@ -214,13 +215,13 @@ const proceedWithPayment = async (latitude, longitude, totalAmount) => {
 
   
   // ✅ Function to check payment status every 5 seconds
-  const checkPaymentStatus = async (tx_ref, user_id) => {
+  const checkPaymentStatus = async (tx_ref, user_id, customerLat, customerLng) => {
     if (!tx_ref || !user_id) {
       console.error("❌ Error: Missing tx_ref or user_id!", { tx_ref, user_id });
       return;
     }
   
-    console.log("✅ Checking payment for:", { tx_ref, user_id });
+    console.log("✅ Checking payment for:", { tx_ref, user_id, customerLat, customerLng });
   
     const interval = setInterval(async () => {
       try {
