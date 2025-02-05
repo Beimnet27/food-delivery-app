@@ -138,16 +138,30 @@ const Cart = () => {
         return;
     }
 
+    // Request user location
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser.");
+      return;
+  }
+  
     setIsProcessingPayment(true);
 
-    const paymentData = {
-        amount: totalAmount.toFixed(2),
-        currency: "ETB",
-        email: userEmail,
-        first_name: userName.split(" ")[0] || "",
-        last_name: userName.split(" ")[1] || "",
-        callback_url: "https://bitegodelivery.netlify.app/PaymentSuccess", // ✅ No tx_ref in URL
-    };
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+          const { latitude, longitude } = position.coords;
+
+          console.log("User Location:", latitude, longitude);
+
+          const paymentData = {
+              amount: totalAmount.toFixed(2),
+              currency: "ETB",
+              email: userEmail,
+              first_name: userName.split(" ")[0] || "",
+              last_name: userName.split(" ")[1] || "",
+              customerLat: latitude,  // ✅ Send user location
+              customerLng: longitude,
+              callback_url: "https://bitegodelivery.netlify.app/PaymentSuccess",
+          };
 
     try {
         const response = await fetch(
@@ -182,6 +196,13 @@ const Cart = () => {
         console.error("Error initializing payment:", error);
         setIsProcessingPayment(false);
     }
+  },
+  (error) => {
+      console.error("Error getting location:", error);
+      alert("Failed to get your location. Please enable location services and try again.");
+      setIsProcessingPayment(false);
+  }
+);
 };
 
   

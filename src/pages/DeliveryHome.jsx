@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { db } from "../firebase/firestore"; // Import Firestore
 import { collection, updateDoc, doc, getDoc, query, where, onSnapshot } from "firebase/firestore";
 import { useLocation } from "react-router-dom";
+import { getCurrentLocation, getNavigationLink, DeliveryMap } from "../utils/Location"; // Utility function to get current location
 
 const DeliveryPersonHome = () => {
   const location = useLocation();
@@ -9,6 +10,7 @@ const DeliveryPersonHome = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deliveryPerson, setDeliveryPerson] = useState(null);
+  const [currentLocation, setCurrentLocation] = useState(null);
 
   useEffect(() => {
     if (!userId) {
@@ -52,8 +54,18 @@ const DeliveryPersonHome = () => {
     return () => unsubscribe();
   }, []);
 
-  const handleAcceptOrder = async (orderId) => {
+  const handleAcceptOrder = async (orderId, customerAddress) => {
     if (!deliveryPerson) return alert("Delivery person data is missing.");
+    
+    // Get current location
+    try {
+      const location = await getCurrentPosition();
+      setCurrentLocation(location);
+    } catch (error) {
+      console.error("Error getting location:", error);
+      alert("Failed to get your location. Please enable location services.");
+      return;
+    }
 
     try {
       const orderRef = doc(db, "orders", orderId);
@@ -62,6 +74,7 @@ const DeliveryPersonHome = () => {
         deliverer: {
           id: deliveryPerson.id,
           name: deliveryPerson.name,
+          location: currentLocation,
         },
       });
 
@@ -88,7 +101,12 @@ const DeliveryPersonHome = () => {
       ) : (
         <div className="grid gap-4">
           {orders.map((order) => (
-            <div key={order.id} className="p-4 border rounded-lg shadow-md bg-white flex items-center">
+            <div
+              key={order.id}
+              className={`p-4 border rounded-lg shadow-md flex items-center ${
+                order.state === "onDeliver" && order.deliverer?.id === userId ? "bg-green-200" : "bg-white"
+              }`}
+            >
               <img
                 src={order.image || "/placeholder.png"}
                 alt={order.name}
@@ -99,8 +117,7 @@ const DeliveryPersonHome = () => {
                 <p className="text-gray-500">Customer: {order.customerName}</p>
                 <p className="text-gray-500">Address: {order.address}</p>
                 <p className="text-sm">
-                  Status:{" "}
-                  <span className={`font-bold ${order.state === "ready" ? "text-green-600" : "text-red-500"}`}>
+                  Status: <span className={`font-bold ${order.state === "ready" ? "text-green-600" : "text-red-500"}`}>
                     {order.state}
                   </span>
                 </p>
@@ -109,10 +126,19 @@ const DeliveryPersonHome = () => {
               {order.state === "ready" ? (
                 <button
                   className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
-                  onClick={() => handleAcceptOrder(order.id)}
+                  onClick={() => handleAcceptOrder(order.id, order.address)}
                 >
-                  Take The Order
+                  Accept & Navigate
                 </button>
+              ) : order.deliverer?.id === userId ? (
+                <a
+                  href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(order.address)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                >
+                  Navigate to Customer
+                </a>
               ) : (
                 <span className="text-sm font-medium text-red-500">In Delivery</span>
               )}
