@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom"; // Ensure navigation
 
 const Cart = () => {
   const { cart, setCart, removeFromCart, updateQuantity } = useContext(CartContext);
-  const { user_id, userEmail, userName } = useAuthContext();
+  const { user_id, userEmail, userName, phoneNumber } = useAuthContext();
   const [isLoading, setIsLoading] = useState(true);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const navigate = useNavigate();
@@ -138,46 +138,45 @@ const Cart = () => {
         return;
     }
 
+    // Request user location
     if (!navigator.geolocation) {
         alert("Geolocation is not supported by your browser.");
-        console.error("❌ Geolocation is not supported.");
         return;
     }
 
     setIsProcessingPayment(true);
-    console.log("📍 Requesting user location...");
 
     navigator.geolocation.getCurrentPosition(
         async (position) => {
-            console.log("✅ Location received:", position); // Debugging
-
             const { latitude, longitude } = position.coords;
-            alert(`Location fetched! Latitude: ${latitude}, Longitude: ${longitude}`);
+            console.log("✅ User Location:", latitude, longitude);
 
-            console.log("✅ Latitude:", latitude, "Longitude:", longitude);
-
+            // Debugging Step
+            alert(`Location fetched: Latitude: ${latitude}, Longitude: ${longitude}`);
+            localStorage.setItem("customerLat", latitude);
+            localStorage.setItem("customerLng", longitude);
+            // ✅ Now proceed with payment after getting the location
             await proceedWithPayment(latitude, longitude, totalAmount);
         },
         (error) => {
             console.error("❌ Error getting location:", error);
-            alert(`Failed to get location: ${error.message}`);
+            alert("Failed to get your location. Please enable location services and try again.");
             setIsProcessingPayment(false);
-        },
-        { timeout: 10000, enableHighAccuracy: true } // Increase timeout & request high accuracy
+        }
     );
 };
 
-const proceedWithPayment = async (totalAmount) => {
+const proceedWithPayment = async (latitude, longitude, totalAmount) => {
     const paymentData = {
         amount: totalAmount.toFixed(2),
         currency: "ETB",
         email: userEmail,
         first_name: userName.split(" ")[0] || "",
         last_name: userName.split(" ")[1] || "",
+        customerLat: latitude,  
+        customerLng: longitude,
         callback_url: "https://bitegodelivery.netlify.app/PaymentSuccess",
     };
-
-    console.log("📤 Sending payment data:", paymentData);
 
     try {
         const response = await fetch(
@@ -190,19 +189,17 @@ const proceedWithPayment = async (totalAmount) => {
         );
 
         const result = await response.json();
-        console.log("💳 Payment API Response:", result);
+        console.log("✅ Payment API Response:", result);
 
         if (response.ok && result.checkout_url && result.tx_ref) {
-            localStorage.setItem("tx_ref", result.tx_ref); // ✅ Store transaction reference
+            localStorage.setItem("tx_ref", result.tx_ref); 
 
-            // ✅ Open checkout page
             const chapaWindow = window.open(result.checkout_url, "_blank");
 
             if (!chapaWindow) {
                 alert("Pop-up blocked! Please allow pop-ups in your browser.");
             }
 
-            // ✅ Start checking payment status
             checkPaymentStatus(result.tx_ref, user_id);
         } else {
             alert(result.error || "Failed to initialize payment.");
@@ -213,7 +210,6 @@ const proceedWithPayment = async (totalAmount) => {
         setIsProcessingPayment(false);
     }
 };
-
 
 
   
