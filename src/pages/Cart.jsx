@@ -216,31 +216,37 @@ const proceedWithPayment = async (latitude, longitude, totalAmount) => {
   
   // ✅ Function to check payment status every 5 seconds
   const checkPaymentStatus = async (tx_ref, user_id, customerLat, customerLng) => {
-    try {
-        const response = await fetch(
-            "https://fooddelivery-backend-api.onrender.com/api/verify-payment",
-            {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ tx_ref, user_id, customerLat, customerLng }), // ✅ Include missing fields
-            }
-        );
-
-        const result = await response.json();
-        console.log("✅ Payment Verification Response:", result);
-
-        if (response.ok && result.success) {
-            alert("Payment Verified! Order placed successfully.");
-            window.location.href = "https://bitegodelivery.netlify.app/PaymentSuccess";
-        } else {
-            alert(result.error || "Payment verification failed.");
-        }
-    } catch (error) {
-        console.error("❌ Error verifying payment:", error);
-        alert("An error occurred while verifying payment.");
+    if (!tx_ref || !user_id) {
+      console.error("❌ Error: Missing tx_ref or user_id!", { tx_ref, user_id });
+      return;
     }
-};
-
+  
+    console.log("✅ Checking payment for:", { tx_ref, user_id, customerLat, customerLng });
+  
+    const interval = setInterval(async () => {
+      try {
+        const response = await fetch(
+          "https://fooddelivery-backend-api.onrender.com/api/verify-payment",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ tx_ref, user_id, customerLat, customerLng }), // ✅ Ensure user_id is included
+          }
+        );
+  
+        const result = await response.json();
+        console.log("🔍 Payment Verification Response:", result);
+  
+        if (response.ok && result.success) {
+          clearInterval(interval);
+          localStorage.removeItem("tx_ref");
+          window.location.href = `/PaymentSuccess?tx_ref=${tx_ref}`;
+        }
+      } catch (error) {
+        console.error("❌ Error verifying payment:", error);
+      }
+    }, 5000);
+  };
   
 
   // const verifyPayment = async () => {
