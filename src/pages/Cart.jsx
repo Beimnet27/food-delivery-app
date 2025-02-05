@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom"; // Ensure navigation
 
 const Cart = () => {
   const { cart, setCart, removeFromCart, updateQuantity } = useContext(CartContext);
-  const { user_id, userEmail, userName, moveCartToOrders } = useAuthContext();
+  const { user_id, userEmail, userName, phoneNumber } = useAuthContext();
   const [isLoading, setIsLoading] = useState(true);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const navigate = useNavigate();
@@ -171,6 +171,7 @@ const proceedWithPayment = async (latitude, longitude, totalAmount) => {
         currency: "ETB",
         email: userEmail,
         first_name: userName.split(" ")[0] || "",
+        phone_number: phoneNumber,
         last_name: userName.split(" ")[1] || "",
         customerLat: latitude,  
         customerLng: longitude,
