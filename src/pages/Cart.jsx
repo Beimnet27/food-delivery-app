@@ -149,60 +149,65 @@ const Cart = () => {
     navigator.geolocation.getCurrentPosition(
         async (position) => {
             const { latitude, longitude } = position.coords;
-            console.log("User Location:", latitude, longitude);
+            console.log("✅ User Location:", latitude, longitude);
+
+            // Debugging Step
+            alert(`Location fetched: Latitude: ${latitude}, Longitude: ${longitude}`);
 
             // ✅ Now proceed with payment after getting the location
-            const paymentData = {
-                amount: totalAmount.toFixed(2),
-                currency: "ETB",
-                email: userEmail,
-                first_name: userName.split(" ")[0] || "",
-                last_name: userName.split(" ")[1] || "",
-                customerLat: latitude,  // ✅ Send user location
-                customerLng: longitude,
-                callback_url: "https://bitegodelivery.netlify.app/PaymentSuccess",
-            };
-
-            try {
-                const response = await fetch(
-                    "https://fooddelivery-backend-api.onrender.com/api/initialize-payment",
-                    {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(paymentData),
-                    }
-                );
-
-                const result = await response.json();
-                console.log("Payment API Response:", result);
-
-                if (response.ok && result.checkout_url && result.tx_ref) {
-                    localStorage.setItem("tx_ref", result.tx_ref); // ✅ Store Chapa's tx_ref
-
-                    // ✅ Open Chapa checkout page
-                    const chapaWindow = window.open(result.checkout_url, "_blank");
-
-                    if (!chapaWindow) {
-                        alert("Pop-up blocked! Please allow pop-ups in your browser.");
-                    }
-
-                    // ✅ Start checking for payment verification
-                    checkPaymentStatus(result.tx_ref, user_id);
-                } else {
-                    alert(result.error || "Failed to initialize payment.");
-                    setIsProcessingPayment(false);
-                }
-            } catch (error) {
-                console.error("Error initializing payment:", error);
-                setIsProcessingPayment(false);
-            }
+            await proceedWithPayment(latitude, longitude, totalAmount);
         },
         (error) => {
-            console.error("Error getting location:", error);
+            console.error("❌ Error getting location:", error);
             alert("Failed to get your location. Please enable location services and try again.");
             setIsProcessingPayment(false);
         }
     );
+};
+
+const proceedWithPayment = async (latitude, longitude, totalAmount) => {
+    const paymentData = {
+        amount: totalAmount.toFixed(2),
+        currency: "ETB",
+        email: userEmail,
+        first_name: userName.split(" ")[0] || "",
+        last_name: userName.split(" ")[1] || "",
+        customerLat: latitude,  
+        customerLng: longitude,
+        callback_url: "https://bitegodelivery.netlify.app/PaymentSuccess",
+    };
+
+    try {
+        const response = await fetch(
+            "https://fooddelivery-backend-api.onrender.com/api/initialize-payment",
+            {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(paymentData),
+            }
+        );
+
+        const result = await response.json();
+        console.log("✅ Payment API Response:", result);
+
+        if (response.ok && result.checkout_url && result.tx_ref) {
+            localStorage.setItem("tx_ref", result.tx_ref); 
+
+            const chapaWindow = window.open(result.checkout_url, "_blank");
+
+            if (!chapaWindow) {
+                alert("Pop-up blocked! Please allow pop-ups in your browser.");
+            }
+
+            checkPaymentStatus(result.tx_ref, user_id);
+        } else {
+            alert(result.error || "Failed to initialize payment.");
+            setIsProcessingPayment(false);
+        }
+    } catch (error) {
+        console.error("❌ Error initializing payment:", error);
+        setIsProcessingPayment(false);
+    }
 };
 
 
