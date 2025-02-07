@@ -77,17 +77,17 @@ const DeliveryPersonHome = () => {
 
   const handleAcceptOrder = async (orderId, customerLat, customerLng) => {
     if (!deliveryPerson) return alert("Delivery person data is missing.");
-
+  
     try {
       const location = await getCurrentLocation();
-
-      if (!location) {
-        alert("Failed to get your location. Please enable location services.");
+      
+      if (!location || !location.lat || !location.lng) {
+        alert("Failed to get your location. Please enable GPS and try again.");
         return;
       }
-
+  
       setCurrentLocation(location);
-
+  
       const orderRef = doc(db, "orders", orderId);
       await updateDoc(orderRef, {
         state: "onDeliver",
@@ -101,7 +101,7 @@ const DeliveryPersonHome = () => {
           lng: Number(customerLng),
         },
       });
-
+  
       setOrders((prev) =>
         prev.map((order) =>
           order.id === orderId
@@ -109,11 +109,13 @@ const DeliveryPersonHome = () => {
             : order
         )
       );
+  
     } catch (error) {
       console.error("Error:", error);
       alert(`Error getting location: ${error.message || error}`);
     }
   };
+  
 
   if (loading)
     return (
@@ -174,17 +176,21 @@ const DeliveryPersonHome = () => {
                   Accept & Navigate
                 </button>
               ) : order.deliverer?.id === userId ? (
-                <a
-                  href={getNavigationLink(currentLocation, {
-                    lat: order.customerLat,
-                    lng: order.customerLng,
-                  })}
+                 <a
+                  href={getNavigationLink(currentLocation, { lat: order.customerLat, lng: order.customerLng })}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-5 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300"
+                  onClick={(e) => {
+                    if (!currentLocation) {
+                      alert("Your location is not available. Please enable GPS.");
+                      e.preventDefault();
+                    }
+                  }}
                 >
                   Navigate to Customer
                 </a>
+
               ) : (
                 <span className="text-sm font-medium text-red-500">In Delivery</span>
               )}

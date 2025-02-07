@@ -25,10 +25,12 @@ export const getCurrentLocation = () => {
 };
 
 // Function to generate a Google Maps navigation link
-export const getNavigationLink = (start, end) => {
-  if (!start || !end) return "#"; // Prevent errors if data is missing
-  return `https://www.google.com/maps/dir/${start.lat},${start.lng}/${end.lat},${end.lng}`;
+export const getNavigationLink = (currentLocation, customerLocation) => {
+  if (!currentLocation || !customerLocation) return "#"; // Prevent invalid URLs
+
+  return `https://www.google.com/maps/dir/?api=1&origin=${currentLocation.lat},${currentLocation.lng}&destination=${customerLocation.lat},${customerLocation.lng}`;
 };
+
 
 // Interactive Map Component
 export const DeliveryMap = ({ deliveryLocation, customerLocation }) => {
