@@ -26,7 +26,11 @@ export const getCurrentLocation = () => {
 
 // Function to generate a Google Maps navigation link
 export const getNavigationLink = (currentLocation, customerLocation) => {
-  if (!currentLocation || !customerLocation) return "#"; // Prevent invalid URLs
+  if (!currentLocation){
+    const location = getCurrentLocation();
+    currentLocation = location;
+  }
+  if (!customerLocation) return "#"; // Prevent invalid URLs
 
   return `https://www.google.com/maps/dir/?api=1&origin=${currentLocation.lat},${currentLocation.lng}&destination=${customerLocation.lat},${customerLocation.lng}`;
 };
