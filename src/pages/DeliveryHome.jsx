@@ -96,10 +96,10 @@ const DeliveryPersonHome = () => {
           name: deliveryPerson.name,
           location,
         },
-        customerLocation: {
-          lat: Number(customerLat),
-          lng: Number(customerLng),
-        },
+        // customerLocation: {
+        //   lat: Number(customerLat),
+        //   lng: Number(customerLng),
+        // },
       });
   
       setOrders((prev) =>
@@ -177,12 +177,12 @@ const DeliveryPersonHome = () => {
                 </button>
               ) : order.deliverer?.id === userId ? (
                  <a
-                  href={getNavigationLink(currentLocation, { lat: order.customerLat, lng: order.customerLng })}
+                  href={getNavigationLink(order.deliverer.location,  order.customerLat, order.customerLng )}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-5 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300"
                   onClick={(e) => {
-                    if (!currentLocation) {
+                    if (!order.deliverer.location) {
                       alert("Your location is not available. Please enable GPS.");
                       e.preventDefault();
                     }
