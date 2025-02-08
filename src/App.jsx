@@ -14,7 +14,7 @@ import CustomerList from './components/customerList';
 import DeliveryManagement from './components/deliveryManagement';
 import OrderManagement from './components/orderManagement';
 import PrivateRoute from './components/privateRoute';
-import AuthContext from './context/AuthContext';
+import { AuthContextProvider } from './context/AuthContext';
 import Orders from './pages/Orders';
 
 const App = () => {
@@ -26,19 +26,19 @@ const App = () => {
         <Route path="/signup" element={<Signup />} />
         
         <Route path="/home" element={
-          <AuthContext>
+          <AuthContextProvider>
           <Home />
-          </AuthContext> 
+          </AuthContextProvider> 
         }/>
         <Route path="/cart" element={
-          <AuthContext>
+          <AuthContextProvider>
             <Cart />
-            </AuthContext>
+            </AuthContextProvider>
           } />
         <Route path="/orders" element={
-          <AuthContext>
+          <AuthContextProvider>
             <Orders />
-          </AuthContext>
+          </AuthContextProvider>
         } />
 
         <Route path="/cart-context" element={<CartContext />} />
