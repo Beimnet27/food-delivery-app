@@ -1,6 +1,7 @@
 import { useContext } from "react";
 import { CartContext } from "../context/CartContext";
 import Navbar from "../components/Navbar";
+import { Link } from "react-router-dom";
 import { useAuthContext } from "../context/AuthContext";
 import { quickEats, dailyDelights } from "../data/Menu";
 
@@ -44,10 +45,10 @@ const Home = () => {
         <div className="bg-black bg-opacity-50 p-10 rounded-xl inline-block">
           <h1 className="text-6xl font-extrabold">BlackMax Restaurant</h1>
           {userName && <p className="text-lg italic mt-4">Welcome, {userName}!</p>}
-          <p className="text-xl mt-2">Savor the Best Tastes, Right at Your Doorstep!</p>
-          <button className="mt-6 px-8 py-3 bg-green-500 text-white font-bold text-lg rounded-lg hover:bg-green-400 transition duration-300">
-            Order Now
-          </button>
+          <p className="text-xl mt-2 mb-6">Savor the Best Tastes, Right at Your Doorstep!</p>
+          <Link to="/orders" className="mt-6 px-8 py-3 bg-green-500 text-white font-bold text-lg rounded-lg hover:bg-green-400 transition duration-300" >
+            Your Order
+          </Link>
         </div>
       </header>
 

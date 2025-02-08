@@ -14,6 +14,8 @@ import CustomerList from './components/customerList';
 import DeliveryManagement from './components/deliveryManagement';
 import OrderManagement from './components/orderManagement';
 import PrivateRoute from './components/privateRoute';
+import AuthContext from './context/AuthContext';
+import Orders from './pages/Orders';
 
 const App = () => {
   return (
@@ -22,8 +24,23 @@ const App = () => {
         <Route path="/" element={<Welcome />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/cart" element={<Cart />} />
+        
+        <Route path="/home" element={
+          <AuthContext>
+          <Home />
+          </AuthContext> 
+        }/>
+        <Route path="/cart" element={
+          <AuthContext>
+            <Cart />
+            </AuthContext>
+          } />
+        <Route path="/orders" element={
+          <AuthContext>
+            <Orders />
+          </AuthContext>
+        } />
+
         <Route path="/cart-context" element={<CartContext />} />
         
         {/* Delivery Person Routes */}
