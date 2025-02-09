@@ -86,7 +86,7 @@ const DeliveryPersonHome = () => {
   }, [userId]);
 
   const handleAcceptOrder = async (order, parentDocId) => {
-    if (!userId || !deliveryPerson?.name || !deliveryPerson?.phoneNumber) {
+    if (!userId || !deliveryPerson?.name || !deliveryPerson?.phone) {
       alert("Delivery person data is missing.");
       return;
     }
@@ -125,7 +125,7 @@ const DeliveryPersonHome = () => {
               deliverer: {
                 id: userId,
                 name: deliveryPerson.name,
-                phoneNumber: deliveryPerson.phoneNumber,
+                phoneNumber: deliveryPerson.phone,
                 location,
               },
             }
