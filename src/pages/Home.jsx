@@ -61,10 +61,6 @@ const Home = () => {
         <h2 className="text-4xl font-semibold text-gray-800 mb-6">Daily Delights</h2>
         {renderFoodCards(dailyDelights)}
       </section>
-
-      <footer className="mt-16 py-6 text-center bg-gray-800 text-white">
-        <p className="text-sm">&copy; {new Date().getFullYear()} BlackMax Restaurant. All rights reserved.</p>
-      </footer>
     </div>
   );
 };
