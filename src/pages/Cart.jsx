@@ -4,6 +4,7 @@ import { doc, getDoc, setDoc, collection, addDoc } from "firebase/firestore";
 import { db } from "../firebase/firestore";
 import { useAuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom"; // Ensure navigation
+import Navbar from "../components/Navbar";
 
 const Cart = () => {
   const { cart, setCart, removeFromCart, updateQuantity } = useContext(CartContext);
@@ -60,70 +61,6 @@ const Cart = () => {
   const calculateTotal = () => {
     return cart.reduce((total, item) => total + item.price * item.quantity, 0);
   };
-
-  // Handle Checkout with Chapa
-  // const handleCheckout = async () => {
-  //   const totalAmount = calculateTotal();
-  
-  //   if (totalAmount <= 0) {
-  //     alert("Your cart is empty!");
-  //     return;
-  //   }
-  
-  //   if (!userEmail || !userName) {
-  //     alert("Please provide user details.");
-  //     return;
-  //   }
-  
-  //   setIsProcessingPayment(true);
-  
-  //   // ✅ Generate a truly unique `tx_ref` using timestamp + random number
-  //   const uniqueTxRef = `tx_${Date.now()}_${Math.floor(Math.random() * 100000)}`;
-  
-  //   const paymentData = {
-  //     amount: totalAmount.toFixed(2),
-  //     currency: "ETB",
-  //     email: userEmail,
-  //     first_name: userName.split(" ")[0] || "",
-  //     last_name: userName.split(" ")[1] || "",
-  //     callback_url: "https://bitegodelivery.netlify.app/payment-success",
-  //     tx_ref: uniqueTxRef, // ✅ Use a unique transaction reference
-  //   };
-  
-  //   try {
-  //     const response = await fetch(
-  //       "https://fooddelivery-backend-api.onrender.com/api/initialize-payment",
-  //       {
-  //         method: "POST",
-  //         headers: { "Content-Type": "application/json" },
-  //         body: JSON.stringify(paymentData),
-  //       }
-  //     );
-  
-  //     const result = await response.json();
-  //     console.log("Payment API Response:", result);
-  
-  //     if (response.ok && result.checkout_url) {
-  //       localStorage.setItem("tx_ref", uniqueTxRef); // ✅ Save unique tx_ref
-  
-  //       // ✅ Open payment link directly to prevent pop-up blocking
-  //       const chapaWindow = window.open(result.checkout_url, "_blank");
-  
-  //       if (!chapaWindow) {
-  //         alert("Pop-up blocked! Please allow pop-ups in your browser.");
-  //       }
-  
-  //       // Start verifying payment
-  //       await verifyPayment(uniqueTxRef);
-  //     } else {
-  //       alert(result.error || "Failed to initialize payment.");
-  //       setIsProcessingPayment(false);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error initializing payment:", error);
-  //     setIsProcessingPayment(false);
-  //   }
-  // };
 
   const handleCheckout = async () => { 
     const totalAmount = calculateTotal();
@@ -292,6 +229,8 @@ const proceedWithPayment = async (latitude, longitude, totalAmount) => {
   }
 
   return (
+    <>
+    <Navbar />
     <div className="p-6 text-black">
       <h1 className="text-3xl font-bold text-green-400 mb-6">Your Cart</h1>
       {cart.length > 0 ? (
@@ -345,6 +284,7 @@ const proceedWithPayment = async (latitude, longitude, totalAmount) => {
         <p className="text-gray-300">Your cart is empty.</p>
       )}
     </div>
+    </>
   );
 };
 

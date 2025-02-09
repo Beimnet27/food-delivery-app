@@ -19,12 +19,14 @@ import CustomerList from "./components/customerList";
 import DeliveryManagement from "./components/deliveryManagement";
 import OrderManagement from "./components/orderManagement";
 import PrivateRoute from "./components/privateRoute";
+
 import Footer from "./components/Footer";
 
 const App = () => {
   return (
     <Router>
       <AuthContextProvider>
+      <React.StrictMode>
         <div className="flex flex-col min-h-screen">
           <main className="flex-grow">
             <Routes>
@@ -61,6 +63,7 @@ const App = () => {
           {/* Footer - Always Visible */}
           <Footer />
         </div>
+       </React.StrictMode>
       </AuthContextProvider>
     </Router>
   );
