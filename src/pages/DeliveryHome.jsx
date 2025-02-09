@@ -86,38 +86,53 @@ const DeliveryPersonHome = () => {
     return () => clearInterval(updateLocationInterval);
   }, [userId]);
 
-  // ✅ Accept Order and start delivery
-  const handleAcceptOrder = async (order) => {
+  const handleAcceptOrder = async (order, parentDocId) => {
     if (!userId) return alert("Delivery person data is missing.");
-
+  
     try {
       const location = await getCurrentLocation();
       if (!location?.lat || !location?.lng) {
         alert("Failed to get your location. Enable GPS and try again.");
         return;
       }
-
+  
       setCurrentLocation(location);
-
-      const orderRef = doc(db, "orders", order.id);
-      await updateDoc(orderRef, {
-        state: "onDeliver",
-        deliverer: {
-          id: userId,
-          name: "Your Name", // Replace with dynamic name
-          location,
-        },
-      });
-
+  
+      const orderRef = doc(db, "orders", parentDocId);
+      const orderDoc = await getDoc(orderRef);
+  
+      if (!orderDoc.exists()) {
+        alert("Order not found.");
+        return;
+      }
+  
+      const data = orderDoc.data();
+      if (!Array.isArray(data.orders)) {
+        alert("Invalid order structure.");
+        return;
+      }
+  
+      // Update the specific order inside the array
+      const updatedOrders = data.orders.map((o) =>
+        o.tx_ref === order.tx_ref // Match order by `tx_ref` instead of `id`
+          ? { ...o, state: "onDeliver", deliverer: { id: userId, name: "Your Name", location } }
+          : o
+      );
+  
+      // Update Firestore
+      await updateDoc(orderRef, { orders: updatedOrders });
+  
+      // Update state to reflect changes
       setOrders((prev) =>
         prev.map((o) =>
-          o.id === order.id ? { ...o, state: "onDeliver", deliverer: { id: userId, name: "Your Name", location } } : o
+          o.tx_ref === order.tx_ref ? { ...o, state: "onDeliver", deliverer: { id: userId, name: "Your Name", location } } : o
         )
       );
     } catch (error) {
       console.error("Error accepting order:", error);
     }
   };
+  
 
   // ✅ Mark Order as Delivered
   const markAsDelivered = async (order) => {
