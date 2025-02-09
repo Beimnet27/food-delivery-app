@@ -1,25 +1,25 @@
 import { useContext, useEffect, useState } from "react";
 import { CartContext } from "../context/CartContext";
-import { doc, getDoc, setDoc, collection, addDoc, deleteDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc, arrayRemove } from "firebase/firestore";
 import { db } from "../firebase/firestore";
 import { useAuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 const Orders = () => {
-  const { cart, setCart } = useContext(CartContext);
   const { user_id } = useAuthContext();
   const [orders, setOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const navigate = useNavigate();
 
-  // Fetch user orders from Firestore
   useEffect(() => {
     const fetchOrders = async () => {
       try {
+        if (!user_id) return;
+
         const orderRef = doc(db, "orders", user_id);
         const orderDoc = await getDoc(orderRef);
+
         if (orderDoc.exists()) {
-          setOrders(orderDoc.data().items || []);
+          setOrders(orderDoc.data().orders || []);
         }
       } catch (error) {
         console.error("Error fetching orders:", error);
@@ -27,43 +27,51 @@ const Orders = () => {
         setIsLoading(false);
       }
     };
+
     fetchOrders();
   }, [user_id]);
 
-  // Function to mark order as delivered
+  // ✅ Mark as Delivered + Rate Delivery Person
   const markAsDelivered = async (order) => {
     try {
-      const completedOrderRef = doc(db, "completedOrders", order.id);
+      if (!user_id) return;
+
+      const userOrdersRef = doc(db, "orders", user_id);
+      const completedOrderRef = doc(db, "completedOrders", `${user_id}_${order.tx_ref}`);
+
+      // ✅ Move order to completedOrders collection
       await setDoc(completedOrderRef, { ...order, state: "completed" });
 
-      // Remove order from "orders" collection
-      await deleteDoc(doc(db, "orders", order.id));
+      // ✅ Remove from orders collection
+      await updateDoc(userOrdersRef, {
+        orders: arrayRemove(order),
+      });
 
-      // Update rating for the delivery person
+      // ✅ Update Deliverer Rating
       if (order.deliverer?.id) {
         const delivererRef = doc(db, "deliveryPerson", order.deliverer.id);
         const delivererDoc = await getDoc(delivererRef);
 
         if (delivererDoc.exists()) {
           const delivererData = delivererDoc.data();
-          const newRating = (delivererData.rating || 0) + 5; // Adding 5 stars
+          const newRating = (delivererData.rating || 0) + 5; // Add 5 stars
 
-          await setDoc(delivererRef, { ...delivererData, rating: newRating });
+          await updateDoc(delivererRef, { rating: newRating });
         }
       }
 
-      // Remove order from UI
-      setOrders(orders.filter((o) => o.id !== order.id));
+      // ✅ Remove order from UI
+      setOrders((prevOrders) => prevOrders.filter((o) => o.tx_ref !== order.tx_ref));
 
-      alert("Order marked as completed and delivery person rated!");
+      alert("Order marked as completed! Deliverer rated.");
     } catch (error) {
       console.error("Error completing order:", error);
     }
   };
 
-  // Open map with order location
-  const openMap = (lat, lng) => {
-    const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+  // ✅ Open Google Maps with customer & deliverer location
+  const openMap = (customerLat, customerLng, delivererLat, delivererLng) => {
+    const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${delivererLat},${delivererLng}&destination=${customerLat},${customerLng}`;
     window.open(googleMapsUrl, "_blank");
   };
 
@@ -76,23 +84,37 @@ const Orders = () => {
       ) : orders.length > 0 ? (
         <div className="space-y-6">
           {orders.map((order) => (
-            <div key={order.id} className="bg-white shadow-md p-4 rounded-lg">
-              <div className="flex items-center gap-4">
-                <img src={order.image} alt={order.name} className="h-16 w-16 rounded-md" />
-                <div className="flex-1">
-                  <h2 className="text-xl font-semibold">{order.name}</h2>
-                  <p className="text-gray-700">${order.price} x {order.quantity}</p>
-                  <p className="text-sm text-gray-500">Status: <span className="font-semibold text-blue-500">{order.state}</span></p>
-                  {order.deliverer && (
-                    <p className="text-sm text-gray-500">Deliverer: <span className="font-semibold">{order.deliverer.name}</span></p>
-                  )}
+            <div key={order.tx_ref} className="bg-white shadow-md p-6 rounded-lg">
+              <h2 className="text-xl font-semibold text-gray-800 mb-2">{order.status}</h2>
+              <p className="text-gray-700 mb-1">State: <span className="font-semibold text-blue-500">{order.state}</span></p>
+              <p className="text-gray-600">Phone: {order.phoneNumber}</p>
+              <p className="text-gray-600">Transaction ID: {order.tx_ref}</p>
+
+              <div className="mt-4">
+                <h3 className="text-lg font-semibold text-gray-700">Ordered Items:</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {order.items.map((item) => (
+                    <div key={item.id} className="flex items-center bg-gray-50 p-3 rounded-md shadow-sm">
+                      <img src={item.image} alt={item.name} className="h-16 w-16 rounded-md" />
+                      <div className="ml-4">
+                        <h4 className="text-md font-medium">{item.name}</h4>
+                        <p className="text-gray-700">${item.price} x {item.quantity}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
 
-              <div className="mt-4 flex gap-4">
+              {order.state === "onDeliver" && order.deliverer && (
+                <div className="mt-4">
+                  <p className="text-gray-700">Deliverer: <span className="font-semibold">{order.deliverer.name}</span></p>
+                </div>
+              )}
+
+              <div className="mt-4 flex flex-wrap gap-4">
                 {order.state === "onDeliver" && (
                   <button
-                    onClick={() => openMap(order.customerLat, order.customerLng)}
+                    onClick={() => openMap(order.customerLat, order.customerLng, order.deliverer?.location.lat, order.deliverer?.location.lng)}
                     className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600"
                   >
                     Track Order on Map
