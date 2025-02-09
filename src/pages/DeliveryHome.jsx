@@ -85,6 +85,7 @@ const DeliveryPersonHome = () => {
     return () => clearInterval(updateLocationInterval);
   }, [userId]);
 
+  //Accept Orders and Add deliverer details
   const handleAcceptOrder = async (order, parentDocId) => {
     if (!userId || !deliveryPerson?.name || !deliveryPerson?.phone) {
       alert("Delivery person data is missing.");
@@ -110,13 +111,12 @@ const DeliveryPersonHome = () => {
   
       const data = orderDoc.data();
   
-      // ✅ Ensure the structure is correct
       if (!Array.isArray(data.orders)) {
         alert("Invalid order structure.");
         return;
       }
   
-      // ✅ Update the specific order inside the array
+      // ✅ Ensure the correct order is updated inside the array
       const updatedOrders = data.orders.map((o) =>
         o.tx_ref === order.tx_ref
           ? {
@@ -133,9 +133,9 @@ const DeliveryPersonHome = () => {
       );
   
       // ✅ Update Firestore
-      await setDoc(orderRef, { orders: updatedOrders }, { merge: true });
+      await updateDoc(orderRef, { orders: updatedOrders });
   
-      // ✅ Update state to reflect changes
+      // ✅ Update local state to reflect changes
       setOrders((prev) =>
         prev.map((o) =>
           o.tx_ref === order.tx_ref
@@ -145,7 +145,7 @@ const DeliveryPersonHome = () => {
                 deliverer: {
                   id: userId,
                   name: deliveryPerson.name,
-                  phoneNumber: deliveryPerson.phoneNumber,
+                  phoneNumber: deliveryPerson.phone,
                   location,
                 },
               }
@@ -158,27 +158,6 @@ const DeliveryPersonHome = () => {
       console.error("Error accepting order:", error);
     }
   };  
-  
-
-  // ✅ Mark Order as Delivered
-  // const markAsDelivered = async (order) => {
-  //   try {
-  //     const orderRef = doc(db, "orders", order.id);
-  //     const completedOrderRef = doc(db, "completedOrders", `${userId}_${order.id}`);
-
-  //     // ✅ Move order to completedOrders
-  //     await setDoc(completedOrderRef, { ...order, state: "completed" });
-
-  //     // ✅ Remove from orders collection
-  //     await updateDoc(orderRef, { state: "completed" });
-
-  //     setOrders((prevOrders) => prevOrders.filter((o) => o.id !== order.id));
-
-  //     alert("Order marked as delivered!");
-  //   } catch (error) {
-  //     console.error("Error completing order:", error);
-  //   }
-  // };
 
 // ✅ Open Google Maps
 const openMap = (lat, lng) => {
@@ -231,11 +210,12 @@ if (loading)
   
                 {order.state === "ready" ? (
                   <button
-                    className="px-5 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-300"
-                    onClick={() => handleAcceptOrder(order)}
-                  >
-                    Accept & Navigate
-                  </button>
+                  className="px-5 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-300"
+                  onClick={() => handleAcceptOrder(order, order.parentDocId)}
+                >
+                  Accept & Navigate
+                </button>
+                
                 ) : order.deliverer?.id === userId ? (
                   <>
                     <button
@@ -244,12 +224,7 @@ if (loading)
                     >
                       Track Order
                     </button>
-                    {/* <button
-                      onClick={() => markAsDelivered(order)}
-                      className="px-5 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-300"
-                    >
-                      Mark as Delivered
-                    </button> */}
+
                   </>
                 ) : (
                   <span className="text-sm font-medium text-red-500">In Delivery</span>
