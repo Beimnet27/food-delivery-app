@@ -153,30 +153,6 @@ const DeliveryPersonHome = () => {
   //   }
   // };
 
-    const [address, setAddress] = useState("Fetching address...");
-  
-    // useEffect(() => {
-      const fetchAddress = async (customerLat, customerLng) => {
-        try {
-          const response = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${customerLat}&lon=${customerLng}`
-          );
-          const data = await response.json();
-  
-          if (data.display_name) {
-            setAddress(data.display_name);
-          } else {
-            setAddress("Address not found");
-          }
-        } catch (error) {
-          console.error("Error fetching address:", error);
-          setAddress("Failed to fetch address");
-        }
-      };
-  
-    //   fetchAddress();
-    // }, [order.customerLat, order.customerLng]);
-
 // ✅ Open Google Maps
 const openMap = (lat, lng) => {
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
@@ -213,7 +189,7 @@ if (loading)
                 <div className="flex-1">
                   <h2 className="text-xl font-semibold text-gray-800">{order.items[0]?.name}</h2>
                   <p className="text-gray-600 flex items-center">
-      <FaMapMarkerAlt className="text-red-500 mr-2" /> {fetchAddress(order.customerLat, order.customerLng)}
+      <FaMapMarkerAlt className="text-red-500 mr-2" /> Addis Ababa
     </p>
                   <p className="text-sm">
                     Status: <span className="font-bold text-blue-500">{order.state}</span>
