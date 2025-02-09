@@ -56,7 +56,6 @@ const DeliveryPersonHome = () => {
             allOrders.push(...filteredOrders);
           }
         });
-  
         setOrders(allOrders);
         setLoading(false);
       }, (error) => {
@@ -64,7 +63,7 @@ const DeliveryPersonHome = () => {
         setLoading(false);
       });
     };
-    fetchAddress(order.customerLat, order.customerLng)
+    
     const unsubscribe = fetchOrders();
     return () => unsubscribe();
   }, []);
@@ -202,7 +201,7 @@ if (loading)
           <div className="grid gap-6">
             {orders.map((order) => (
               <div
-                key={order.id}
+                key={order.tx_ref}
                 className={`p-4 border rounded-lg shadow-lg flex items-center space-x-4 ${
                   order.state === "onDeliver" && order.deliverer?.id === userId
                     ? "bg-green-200 border-green-500"
@@ -214,7 +213,7 @@ if (loading)
                 <div className="flex-1">
                   <h2 className="text-xl font-semibold text-gray-800">{order.items[0]?.name}</h2>
                   <p className="text-gray-600 flex items-center">
-      <FaMapMarkerAlt className="text-red-500 mr-2" /> {address}
+      <FaMapMarkerAlt className="text-red-500 mr-2" /> {fetchAddress(order.customerLat, order.customerLng)}
     </p>
                   <p className="text-sm">
                     Status: <span className="font-bold text-blue-500">{order.state}</span>
