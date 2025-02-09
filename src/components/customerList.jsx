@@ -54,7 +54,7 @@ const CustomerList = () => {
           </thead>
           <tbody>
           {customers
-            .filter((customer) => customer.id !== "admin")
+            .filter((customer) => customer.role !== "admin")
             .map((customer) => (
               <tr key={customer.id} className="hover:bg-gray-50">
                 <td className="py-2 px-4 border-b">{customer.full_name}</td>
