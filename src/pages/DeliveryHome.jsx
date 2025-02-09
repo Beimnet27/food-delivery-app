@@ -86,7 +86,10 @@ const DeliveryPersonHome = () => {
   }, [userId]);
 
   const handleAcceptOrder = async (order, parentDocId) => {
-    if (!userId) return alert("Delivery person data is missing.");
+    if (!userId || !deliveryPerson?.name || !deliveryPerson?.phoneNumber) {
+      alert("Delivery person data is missing.");
+      return;
+    }
   
     try {
       const location = await getCurrentLocation();
@@ -106,31 +109,55 @@ const DeliveryPersonHome = () => {
       }
   
       const data = orderDoc.data();
+  
+      // ✅ Ensure the structure is correct
       if (!Array.isArray(data.orders)) {
         alert("Invalid order structure.");
         return;
       }
   
-      // Update the specific order inside the array
+      // ✅ Update the specific order inside the array
       const updatedOrders = data.orders.map((o) =>
-        o.tx_ref === order.tx_ref // Match order by `tx_ref` instead of `id`
-          ? { ...o, state: "onDeliver", deliverer: { id: userId, name: deliveryPerson.name, location } }
+        o.tx_ref === order.tx_ref
+          ? {
+              ...o,
+              state: "onDeliver",
+              deliverer: {
+                id: userId,
+                name: deliveryPerson.name,
+                phoneNumber: deliveryPerson.phoneNumber,
+                location,
+              },
+            }
           : o
       );
   
-      // Update Firestore
-      await updateDoc(orderRef, { orders: updatedOrders });
+      // ✅ Update Firestore
+      await setDoc(orderRef, { orders: updatedOrders }, { merge: true });
   
-      // Update state to reflect changes
+      // ✅ Update state to reflect changes
       setOrders((prev) =>
         prev.map((o) =>
-          o.tx_ref === order.tx_ref ? { ...o, state: "onDeliver", deliverer: { id: userId, name: deliveryPerson.name, location } } : o
+          o.tx_ref === order.tx_ref
+            ? {
+                ...o,
+                state: "onDeliver",
+                deliverer: {
+                  id: userId,
+                  name: deliveryPerson.name,
+                  phoneNumber: deliveryPerson.phoneNumber,
+                  location,
+                },
+              }
+            : o
         )
       );
+  
+      alert("Order accepted successfully!");
     } catch (error) {
       console.error("Error accepting order:", error);
     }
-  };
+  };  
   
 
   // ✅ Mark Order as Delivered
