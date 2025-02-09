@@ -40,22 +40,24 @@ const DeliveryPersonHome = () => {
   useEffect(() => {
     const fetchOrders = () => {
       const ordersRef = collection(db, "orders");
-      
-      // Fetch all orders documents
+  
       return onSnapshot(ordersRef, (snapshot) => {
         let allOrders = [];
   
         snapshot.docs.forEach((doc) => {
           const data = doc.data();
           if (Array.isArray(data.orders)) {
-            // Extract orders that are "ready" or "onDeliver"
-            const filteredOrders = data.orders.filter(order => 
-              order.state === "ready" || order.state === "onDeliver"
-            );
+            const filteredOrders = data.orders
+              .filter((order) => order.state === "ready" || order.state === "onDeliver")
+              .map((order) => ({
+                ...order,
+                parentDocId: doc.id, // ✅ Attach parent document ID
+              }));
   
             allOrders.push(...filteredOrders);
           }
         });
+  
         setOrders(allOrders);
         setLoading(false);
       }, (error) => {
@@ -63,10 +65,10 @@ const DeliveryPersonHome = () => {
         setLoading(false);
       });
     };
-    
+  
     const unsubscribe = fetchOrders();
     return () => unsubscribe();
-  }, []);
+  }, []);  
   
 
   // ✅ Auto-update delivery person's location
@@ -87,6 +89,11 @@ const DeliveryPersonHome = () => {
 
   //Accept Orders and Add deliverer details
   const handleAcceptOrder = async (order, parentDocId) => {
+    if (!parentDocId) {
+      alert("Parent document ID is missing.");
+      return;
+    }
+  
     if (!userId || !deliveryPerson?.name || !deliveryPerson?.phone) {
       alert("Delivery person data is missing.");
       return;
@@ -116,7 +123,7 @@ const DeliveryPersonHome = () => {
         return;
       }
   
-      // ✅ Ensure the correct order is updated inside the array
+      // ✅ Update only the specific order inside the array
       const updatedOrders = data.orders.map((o) =>
         o.tx_ref === order.tx_ref
           ? {
@@ -135,7 +142,7 @@ const DeliveryPersonHome = () => {
       // ✅ Update Firestore
       await updateDoc(orderRef, { orders: updatedOrders });
   
-      // ✅ Update local state to reflect changes
+      // ✅ Update local state
       setOrders((prev) =>
         prev.map((o) =>
           o.tx_ref === order.tx_ref
@@ -157,7 +164,8 @@ const DeliveryPersonHome = () => {
     } catch (error) {
       console.error("Error accepting order:", error);
     }
-  };  
+  };
+    
 
 // ✅ Open Google Maps
 const openMap = (lat, lng) => {
