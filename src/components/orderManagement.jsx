@@ -41,27 +41,45 @@ const OrderManagement = () => {
   const markAsReady = async (parentDocId, tx_ref) => {
     try {
       const orderRef = doc(db, "orders", parentDocId);
-      const orderDoc = await getDoc(orderRef); // ✅ FIXED getDoc()
-
+      const orderDoc = await getDoc(orderRef);
+  
       if (!orderDoc.exists()) return;
-
+  
       let updatedOrders = orderDoc.data().orders.map((order) =>
         order.tx_ref === tx_ref ? { ...order, state: "ready" } : order
       );
-
+  
       await updateDoc(orderRef, { orders: updatedOrders });
-
+  
       setOrders((prevOrders) =>
         prevOrders.map((order) =>
           order.tx_ref === tx_ref ? { ...order, state: "ready" } : order
         )
       );
-
+  
       alert("Order marked as Ready to Deliver!");
+  
+      // ✅ Send Delivery Email
+      try {
+        const response = await fetch(
+          "https://fooddelivery-backend-api.onrender.com/api/send-delivery-email",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ tx_ref }), // 🔹 Fixed JSON format
+          }
+        );
+  
+        const result = await response.json();
+        console.log("✅ Delivery Email response:", result);
+      } catch (error) {
+        console.error("❌ Error Sending Delivery Email:", error);
+      }
     } catch (error) {
       console.error("Error updating order state:", error);
     }
   };
+  
 
   const deleteOrder = async (parentDocId, tx_ref) => {
     try {
