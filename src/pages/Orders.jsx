@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { doc, getDoc, updateDoc, arrayRemove, setDoc, collection, onSnapshot } from "firebase/firestore";
+import { doc, getDoc, updateDoc, arrayRemove, setDoc, collection, collectionGroup, query, where, getDocs, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase/firestore"; // Ensure this is your Firebase config
 import { FaStar } from "react-icons/fa"; // Star icons for rating
 
@@ -14,38 +14,38 @@ const Orders = ({ user_id }) => {
   // ✅ Fetch Active Orders
   useEffect(() => {
     if (!user_id) return;
-
-    const ordersRef = doc(db, "orders", user_id);
-    const unsubscribe = onSnapshot(ordersRef, (doc) => {
-      if (doc.exists()) {
-        setOrders(doc.data().orders || []);
+  
+    const userOrdersRef = doc(db, "orders", user_id);
+  
+    const unsubscribe = onSnapshot(userOrdersRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        if (data.orders && Array.isArray(data.orders)) {
+          setOrders(data.orders);
+        } else {
+          setOrders([]); // Ensure it doesn't break if orders is missing
+        }
       } else {
         setOrders([]);
       }
       setIsLoading(false);
     });
-
+  
     return () => unsubscribe();
   }, [user_id]);
+  
 
   // ✅ Fetch Completed Orders (Order History)
   useEffect(() => {
     if (!user_id) return;
-
-    const completedOrdersRef = collection(db, "completedOrders");
-    const unsubscribe = onSnapshot(completedOrdersRef, (snapshot) => {
-      let history = [];
-      snapshot.docs.forEach((doc) => {
-        if (doc.id.startsWith(user_id)) {
-          history.push(doc.data());
-        }
-      });
+  
+    const q = query(collectionGroup(db, "completedOrders"), where("user_id", "==", user_id));
+  
+    getDocs(q).then((snapshot) => {
+      const history = snapshot.docs.map((doc) => doc.data());
       setCompletedOrders(history);
     });
-
-    return () => unsubscribe();
   }, [user_id]);
-
   // ✅ Mark Order as Delivered & Ask for Rating
   const markAsDelivered = async (order) => {
     setSelectedOrder(order);
@@ -125,7 +125,7 @@ const Orders = ({ user_id }) => {
         <div className="space-y-6">
           {orders.length > 0 ? (
             orders.map((order) => (
-              <div key={order.tx_ref} className="bg-white shadow-md p-6 rounded-lg">
+              <div key={order.tx_ref || `order-${index}`} className="bg-white shadow-md p-6 rounded-lg">
                 <h2 className="text-xl font-semibold text-gray-800 mb-2">{order.status}</h2>
                 <p className="text-gray-700 mb-1">State: <span className="font-semibold text-blue-500">{order.state}</span></p>
                 <p className="text-gray-600">Phone: {order.phoneNumber}</p>
