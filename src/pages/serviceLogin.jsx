@@ -52,16 +52,16 @@ const Login = () => {
           </button>
         </form>
 
-        <p className="mt-4 text-center text-gray-400">
+        {/* <p className="mt-4 text-center text-gray-400">
           Forgot your password?{" "}
           <Link to="/reset-password" className="text-yellow-500 hover:underline">
             Reset Here
           </Link>
-        </p>
+        </p> */}
 
         <p className="mt-4 text-center text-gray-400">
           Don't have an account?{" "}
-          <Link to="/register" className="text-yellow-500 hover:underline">
+          <Link to="/serviceRegister" className="text-yellow-500 hover:underline">
             Sign Up
           </Link>
         </p>

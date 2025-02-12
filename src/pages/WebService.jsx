@@ -21,10 +21,10 @@ const WebService = () => {
             Fair pricing, reliable web apps, and full customization for your restaurant business.
           </p>
           <div className="mt-6 flex gap-4 justify-center md:justify-start">
-            <Link to="/register" className="bg-yellow-500 px-6 py-3 rounded-lg text-gray-900 font-bold hover:bg-yellow-600">
+            <Link to="/serviceRegister" className="bg-yellow-500 px-6 py-3 rounded-lg text-gray-900 font-bold hover:bg-yellow-600">
               Register Now
             </Link>
-            <Link to="/login" className="bg-gray-700 px-6 py-3 rounded-lg text-white font-bold hover:bg-gray-600">
+            <Link to="/serviceLogin" className="bg-gray-700 px-6 py-3 rounded-lg text-white font-bold hover:bg-gray-600">
               Login
             </Link>
           </div>

@@ -2,6 +2,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthContextProvider } from "./context/AuthContext";
 import CartContext from "./context/CartContext";
 
+import ServiceLogin from "./pages/serviceLogin";
+import ServiceRegister from "./pages/serviceRegister";
 import WebService from "./pages/WebService";
 import Welcome from "./pages/Welcome";
 import Login from "./pages/Login";
@@ -39,6 +41,10 @@ const App = () => {
               <Route path="/cart-context" element={<CartContext />} />
               <Route path="/payment-success" element={<PaymentSuccess />} />
 
+              {/* Service Routes */}
+              <Route path="/serviceLogin" element={<ServiceLogin />} />
+              <Route path="/serviceRegister" element={<ServiceRegister />} />
+              
               {/* User Routes */}
               <Route path="/home" element={<Home />} />
               <Route path="/cart" element={<Cart />} />
