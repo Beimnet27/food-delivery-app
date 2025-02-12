@@ -3,6 +3,7 @@ import { doc, updateDoc, arrayRemove, setDoc, onSnapshot, getDoc } from "firebas
 import { db } from "../firebase/firestore"; // Ensure this is your Firebase config
 import { FaStar } from "react-icons/fa"; // Star icons for rating
 import { useAuthContext } from "../context/AuthContext";
+import Navbar from "../components/Navbar";
 
 const Orders = () => {
   const { user_id } = useAuthContext();
@@ -12,6 +13,7 @@ const Orders = () => {
   const [activeTab, setActiveTab] = useState("active"); // "active" or "history"
   const [rating, setRating] = useState(null);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false); // ✅ Prevent duplicate clicks
 
   // ✅ Fetch Active Orders (Live Update)
   useEffect(() => {
@@ -54,15 +56,17 @@ const Orders = () => {
     return () => unsubscribe();
   }, [user_id]);
 
-  // ✅ Mark Order as Delivered & Ask for Rating
+  // ✅ Mark Order as Delivered (Opens Rating Modal)
   const markAsDelivered = (order) => {
     setSelectedOrder(order);
     setRating(null);
   };
 
-  // ✅ Submit Rating & Move to History
+  // ✅ Submit Rating & Move Order to Completed Orders
   const submitRating = async () => {
-    if (!rating || !selectedOrder) return alert("Please select a rating.");
+    if (!rating || !selectedOrder || isSubmitting) return alert("Please select a rating.");
+
+    setIsSubmitting(true);
 
     try {
       const userOrdersRef = doc(db, "orders", user_id);
@@ -90,20 +94,27 @@ const Orders = () => {
         if (delivererDoc.exists()) {
           const delivererData = delivererDoc.data();
           const newRating = delivererData.rating
-            ? (delivererData.rating + rating) / 2
+            ? (delivererData.rating * delivererData.ratingCount + rating) /
+              (delivererData.ratingCount + 1)
             : rating; // Calculate new average rating
 
-          await updateDoc(delivererRef, { rating: newRating });
+          await updateDoc(delivererRef, {
+            rating: newRating,
+            ratingCount: (delivererData.ratingCount || 0) + 1, // Increment rating count
+          });
         } else {
           console.warn("⚠️ Deliverer not found in Firestore!");
         }
       }
 
+      // ✅ UI Update
       setOrders((prev) => prev.filter((o) => o.tx_ref !== selectedOrder.tx_ref));
       setSelectedOrder(null);
+      setIsSubmitting(false);
       alert("Order completed! Thank you for rating.");
     } catch (error) {
       console.error("❌ Error completing order:", error);
+      setIsSubmitting(false);
     }
   };
 
@@ -114,7 +125,10 @@ const Orders = () => {
   };
 
   return (
-    <div className="p-6 text-black bg-gray-100 min-h-screen">
+    <>
+  <Navbar />
+    <div className="mt-12 p-6 text-black bg-gray-100 min-h-screen">
+       
       <h1 className="text-3xl font-bold text-green-600 mb-6 text-center">Your Orders</h1>
 
       {/* ✅ Tabs */}
@@ -206,7 +220,37 @@ const Orders = () => {
           )}
         </div>
       )}
+      {/* ✅ Rating Modal */}
+{selectedOrder && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+    <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+      <h2 className="text-lg font-bold mb-3">Rate the Delivery</h2>
+      
+      {/* ⭐ Star Rating System */}
+      <div className="flex justify-center space-x-2">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <FaStar 
+            key={star} 
+            onClick={() => setRating(star)} 
+            className={`cursor-pointer ${rating >= star ? "text-yellow-500" : "text-gray-400"}`} 
+            size={30} 
+          />
+        ))}
+      </div>
+
+      {/* ✅ Submit Rating */}
+      <button 
+        onClick={submitRating} 
+        className="bg-green-500 text-white px-4 py-2 mt-3 rounded-lg hover:bg-green-600"
+      >
+        Submit Rating
+      </button>
     </div>
+  </div>
+)}
+
+    </div>
+    </>
   );
 };
 
