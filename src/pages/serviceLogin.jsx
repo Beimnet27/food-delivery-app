@@ -1,86 +1,80 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
-import signIn from "../firebase/Auth/signin"; // Import the signIn function
+import { useNavigate, Link } from "react-router-dom";
+import serviceSignin from "../firebase/Auth/serviceLogin"; // Import the sign-in function
 
-const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+const ServiceLogin = () => {
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  // ✅ Handle Input Changes
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // ✅ Handle Login Submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(""); // Clear previous errors
+    setError("");
+    setLoading(true);
 
     try {
-      // Call the signIn function to authenticate the user
-      await signIn(email, password);
+      await serviceSignin(formData.email, formData.password);
       console.log("Login successful");
-      navigate("/home"); // Redirect to Home page on successful login
-    } catch (error) {
-      console.error("Login failed:", error.message);
+      navigate("/serviceHome"); // Redirect to home page after login
+    } catch (err) {
+      console.error("Login failed:", err.message);
       setError("Invalid email or password. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#FF914D] to-yellow-500">
-      <div className="w-full max-w-md bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-8">
-        <h2 className="text-4xl font-extrabold text-center text-yellow-500 mb-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
+      <div className="max-w-md w-full bg-gray-800 p-8 rounded-lg shadow-lg">
+        <h2 className="text-3xl font-extrabold text-center text-yellow-500 mb-4">
           Welcome Back!
         </h2>
-        {error && (
-          <p className="text-center text-red-500 mb-4">{error}</p>
-        )}
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 font-medium mb-2"
-              htmlFor="email"
-            >
-              Email Address
-            </label>
-            <input
-              type="email"
-              id="email"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
-            />
-          </div>
-          <div className="mb-6">
-            <label
-              className="block text-gray-700 font-medium mb-2"
-              htmlFor="password"
-            >
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
-            />
-          </div>
+        <p className="text-center text-gray-400 mb-6">Log in to continue.</p>
+
+        {error && <p className="text-center text-red-500 mb-4">{error}</p>}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {[
+            { label: "Email Address", name: "email", type: "email", placeholder: "you@example.com" },
+            { label: "Password", name: "password", type: "password", placeholder: "Enter your password" },
+          ].map(({ label, name, type, placeholder }) => (
+            <div key={name}>
+              <label className="block text-gray-300 font-medium mb-1">{label}</label>
+              <input
+                type={type}
+                name={name}
+                value={formData[name]}
+                onChange={handleChange}
+                placeholder={placeholder}
+                required
+                className="w-full px-4 py-2 rounded-lg bg-gray-700 text-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              />
+            </div>
+          ))}
+
           <button
             type="submit"
-            className="w-full py-3 bg-yellow-500 text-white font-semibold rounded-lg hover:bg-[#FF914D] transition duration-300"
+            className="w-full py-2 bg-yellow-500 text-white font-semibold rounded-lg hover:bg-[#FF914D] transition duration-300"
+            disabled={loading}
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
-        <p className="text-center text-gray-600 mt-4">
+
+        <p className="text-center text-gray-400 mt-4">
           Don't have an account?{" "}
-          <Link
-            to="/signup"
-            className="text-yellow-500 font-medium hover:underline"
-          >
+          <Link to="/signup" className="text-yellow-500 font-medium hover:underline">
             Sign Up
           </Link>
         </p>
@@ -89,4 +83,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default ServiceLogin;

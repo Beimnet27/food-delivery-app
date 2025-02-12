@@ -4,6 +4,8 @@ import CartContext from "./context/CartContext";
 
 import ServiceLogin from "./pages/serviceLogin";
 import ServiceRegister from "./pages/serviceRegister";
+import ServiceHome from "./pages/serviceHome";
+
 import WebService from "./pages/WebService";
 import Welcome from "./pages/Welcome";
 import Login from "./pages/Login";
@@ -44,7 +46,8 @@ const App = () => {
               {/* Service Routes */}
               <Route path="/serviceLogin" element={<ServiceLogin />} />
               <Route path="/serviceRegister" element={<ServiceRegister />} />
-              
+              <Route path="/serviceHome" element={<ServiceHome />} />
+
               {/* User Routes */}
               <Route path="/home" element={<Home />} />
               <Route path="/cart" element={<Cart />} />

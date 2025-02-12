@@ -1,46 +1,52 @@
-//* Import firebase_app from config.js, signInWithEmailAndPassword, and getAuth from firebase/auth
 import firebase_app from "../config";
-import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
+import { createUserWithEmailAndPassword, getAuth, fetchSignInMethodsForEmail } from "firebase/auth";
 import { getFirestore, setDoc, doc } from "firebase/firestore";
 
-//* Initialize Firebase
 const auth = getAuth(firebase_app);
 const db = getFirestore(firebase_app);
 
-//* Sign up (create user)
 const serviceSignup = async (email, password, fullName, phoneNumber, address) => {
-  let result = null,
-    error = null;
+  let result = null, error = null;
 
   try {
-    console.log("Attempting to create user...");
-    result = await createUserWithEmailAndPassword(auth, email, password);
-    console.log("User created:", result);
-
-    //* Get user details
-    const user = result?.user;
-
-    if (!user) {
-      throw new Error("User object is undefined after serviceSignup.");
+    if (!email || !password || !fullName || !phoneNumber || !address) {
+      throw new Error("All fields are required.");
     }
 
-    //* Store user details in Firestore
-    console.log("Storing user details in Firestore...");
-    await setDoc(doc(db, "RestuarantOwners", user.uid), {
+    console.log("🔍 Checking if email is already in use...");
+    const existingMethods = await fetchSignInMethodsForEmail(auth, email);
+    if (existingMethods.length > 0) {
+      throw new Error("Email is already registered. Please use a different email.");
+    }
+
+    console.log("✅ Email is available. Proceeding with signup...");
+    result = await createUserWithEmailAndPassword(auth, email, password);
+    
+    if (!result?.user) {
+      throw new Error("User creation failed. No user object returned.");
+    }
+    
+    const user = result.user;
+    console.log("✅ User created successfully:", user.uid);
+
+    // ✅ Store user details in Firestore
+    const userData = {
       email: user.email,
       user_id: user.uid,
-      full_name: fullName,
+      full_name: fullName, 
       phone_number: phoneNumber,
       address: address,
       role: "RestuarantOwners",
       createdAt: new Date(),
-    });
+    };
 
-    console.log("User details stored successfully.");
+    console.log("📌 Saving user data:", userData);
+    await setDoc(doc(db, "RestuarantOwners", user.uid), userData);
+    
+    console.log("✅ User details saved to Firestore.");
   } catch (e) {
-    //! Handle errors here
-    console.error("Error during serviceSignup:", e);
-    error = e;
+    console.error("❌ Error during serviceSignup:", e.message);
+    error = e.message;
   }
 
   return { result, error };

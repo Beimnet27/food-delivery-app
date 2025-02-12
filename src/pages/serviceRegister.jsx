@@ -1,140 +1,104 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import signUp from "../firebase/Auth/signup";
 import { doc, setDoc } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
 import { db } from "../firebase/firestore";
-import firebase_app from "../firebase/config";
+import serviceSignup from "../firebase/Auth/serviceSignup";
 
-const auth = getAuth(firebase_app);
+const ServiceSignup = () => {
+  const [formData, setFormData] = useState({
+    name: "",
+    phone: "",
+    address: "",
+    email: "",
+    password: "",
+  });
 
-const Signup = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  // ✅ Handle Input Changes
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // ✅ Handle Signup Submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+    setLoading(true);
+
+    const { email, password, name, phone, address } = formData;
+
+    // ✅ Ensure no field is empty
+    if (!email || !password || !name || !phone || !address) {
+      setError("All fields are required.");
+      setLoading(false);
+      return;
+    }
 
     try {
-      // Create user in Firebase Authentication
-      const userCredential = await serviceSignup(email, password, name, phone, address);
-      const user = userCredential.user;
+      const { result, error } = await serviceSignup(email, password, name, phone, address);
 
-      // Add additional user details to Firestore
-      await setDoc(doc(db, "users", user.uid), {
-        name,
-        phone,
-        address,
-        email,
-        createdAt: new Date(),
-      });
+      if (error) {
+        setError(error);
+        setLoading(false);
+        return;
+      }
 
-      console.log("Signup successful");
-      navigate("/login"); // Redirect to Login page
+      console.log("Signup successful", result);
+      navigate("/serviceLogin"); // Redirect to login page
     } catch (err) {
       setError(err.message);
-      console.error("Error during signup:", err);
+      console.error("❌ Error during signup:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#FF914D] to-yellow-500 flex items-center justify-center">
-      <div className="w-full max-w-md bg-white/90 backdrop-blur-lg rounded-2xl shadow-2xl p-8 transition-transform hover:scale-105">
-        <h2 className="text-3xl font-extrabold text-center text-[#FF914D] mb-6">
-          Create Your Account
-        </h2>
-        <p className="text-center text-gray-600 mb-6">
-          Join us and start your journey today!
-        </p>
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-gray-700 font-medium mb-2" htmlFor="name">
-              Full Name
-            </label>
-            <input
-              type="text"
-              id="name"
-              placeholder="Enter your Full Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              className="w-full px-4 py-2 rounded-lg bg-gray-100 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#FF6F61]"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700 font-medium mb-2" htmlFor="phone">
-              Phone Number
-            </label>
-            <input
-              type="number"
-              id="phone"
-              placeholder="Enter your phone no."
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              required
-              className="w-full px-4 py-2 rounded-lg bg-gray-100 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#FF6F61]"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700 font-medium mb-2" htmlFor="address">
-              Address
-            </label>
-            <input
-              type="text"
-              id="address"
-              placeholder="Enter your Address"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              required
-              className="w-full px-4 py-2 rounded-lg bg-gray-100 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#FF6F61]"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700 font-medium mb-2" htmlFor="email">
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full px-4 py-2 rounded-lg bg-gray-100 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#FF6F61]"
-            />
-          </div>
-          <div className="mb-6">
-            <label className="block text-gray-700 font-medium mb-2" htmlFor="password">
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              placeholder="Create a password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="w-full px-4 py-2 rounded-lg bg-gray-100 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#FF6F61]"
-            />
-          </div>
-          {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+    <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
+      <div className="max-w-md w-full bg-gray-800 p-8 rounded-lg shadow-lg">
+        <h2 className="text-3xl font-extrabold text-center text-[#FF914D] mb-4">Create Account</h2>
+        <p className="text-center text-gray-400 mb-6">Join us and start your journey today!</p>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {[
+            { label: "Full Name", name: "name", type: "text", placeholder: "Enter your full name" },
+            { label: "Phone Number", name: "phone", type: "number", placeholder: "Enter your phone number" },
+            { label: "Address", name: "address", type: "text", placeholder: "Enter your address" },
+            { label: "Email", name: "email", type: "email", placeholder: "Enter your email" },
+            { label: "Password", name: "password", type: "password", placeholder: "Create a password" },
+          ].map(({ label, name, type, placeholder }) => (
+            <div key={name}>
+              <label className="block text-gray-300 font-medium mb-1">{label}</label>
+              <input
+                type={type}
+                name={name}
+                value={formData[name]}
+                onChange={handleChange}
+                placeholder={placeholder}
+                required
+                className="w-full px-4 py-2 rounded-lg bg-gray-700 text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#FF6F61]"
+              />
+            </div>
+          ))}
+
+          {error && <p className="text-red-500 text-center">{error}</p>}
+
           <button
             type="submit"
             className="w-full py-2 bg-[#FF914D] text-white font-semibold rounded-lg hover:bg-[#FF6F61] transition duration-300 focus:outline-none focus:ring-4 focus:ring-[#FF914D]/50"
+            disabled={loading}
           >
-            Sign Up
+            {loading ? "Signing Up..." : "Sign Up"}
           </button>
         </form>
-        <p className="text-center text-gray-600 mt-4">
+
+        <p className="text-center text-gray-400 mt-4">
           Already have an account?{" "}
           <span
-            onClick={() => navigate("/login")}
+            onClick={() => navigate("/serviceLogin")}
             className="text-[#FF914D] cursor-pointer hover:underline"
           >
             Login
@@ -145,4 +109,4 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+export default ServiceSignup;
